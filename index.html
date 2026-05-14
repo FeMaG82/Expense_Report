@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1f2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ExpenseReport">
+<link rel="manifest" href="manifest.json">
+<title>Expense Report Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root {
+  --bg: #f4f1eb;
+  --surface: #ffffff;
+  --surface2: #f9f7f3;
+  --ink: #1a1a18;
+  --ink2: #5a5a52;
+  --ink3: #9a9a8e;
+  --accent: #2d5a3d;
+  --accent2: #4a8c60;
+  --accent-light: #e8f3ec;
+  --danger: #c0392b;
+  --danger-light: #fdf0ef;
+  --warning: #d4860a;
+  --border: #e2ddd6;
+  --shadow: 0 2px 12px rgba(26,26,24,0.08);
+  --shadow-lg: 0 8px 32px rgba(26,26,24,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--ink);
+  color: white;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+.app-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.01em;
+}
+.header-actions { display: flex; gap: 8px; }
+.btn-icon {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-icon:hover { background: rgba(255,255,255,0.2); }
+.btn-icon.green { background: var(--accent); }
+.btn-icon.green:hover { background: var(--accent2); }
+
+/* MAIN */
+.main { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* SECTION CARDS */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .icon { font-size: 1.1rem; }
+
+/* FORMS */
+.form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+input, select, textarea {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: var(--surface2);
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: white;
+}
+input::placeholder { color: var(--ink3); }
+
+/* BUTTONS */
+.btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--ink); color: white; }
+.btn-primary:hover { background: #333; }
+.btn-success { background: var(--accent); color: white; }
+.btn-success:hover { background: var(--accent2); }
+.btn-blue { background: #2563eb; color: white; }
+.btn-blue:hover { background: #1d4ed8; }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--ink2);
+}
+.btn-outline:hover { border-color: var(--ink2); color: var(--ink); }
+.btn-danger { background: var(--danger-light); color: var(--danger); border: 1px solid #f5c6c2; }
+.btn-danger:hover { background: var(--danger); color: white; }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn-full { width: 100%; justify-content: center; }
+
+/* OCR API KEY BANNER */
+.api-banner {
+  background: #fff8e6;
+  border: 1.5px solid #f0c060;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.api-banner .api-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+.api-banner p { font-size: 13px; color: #7a5a00; margin-bottom: 8px; }
+.api-banner a { color: var(--accent); font-weight: 600; }
+.api-key-row { display: flex; gap: 8px; }
+.api-key-row input { flex: 1; font-family: monospace; font-size: 13px; }
+
+/* UPLOAD ZONE */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface2);
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.upload-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+}
+.upload-icon {
+  width: 48px; height: 48px;
+  background: var(--accent-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  margin: 0 auto 12px;
+}
+.upload-zone p { color: var(--ink2); font-size: 14px; }
+.upload-zone small { color: var(--ink3); font-size: 12px; }
+
+/* OCR STATUS */
+.ocr-status {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: none;
+}
+.ocr-status.processing {
+  background: #e8f0ff;
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ocr-status.success {
+  background: var(--accent-light);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ocr-status.error {
+  background: var(--danger-light);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EXPENSES TABLE */
+.expenses-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.expenses-count {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+}
+.total-bar {
+  background: var(--ink);
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.total-bar .total-label { font-size: 13px; opacity: 0.7; }
+.total-bar .total-amount { font-family: 'DM Serif Display', serif; font-size: 1.3rem; }
+
+/* EXPENSE ITEM */
+.expense-item {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--surface2);
+  transition: border-color 0.2s;
+}
+.expense-item:hover { border-color: var(--accent); }
+.expense-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.expense-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.expense-eur {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  color: var(--accent);
+}
+.expense-grid { display: grid; gap: 10px; }
+.expense-grid.g2 { grid-template-columns: 1fr 1fr; }
+.expense-grid.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.expense-grid.g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.receipt-thumb {
+  width: 40px; height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.rate-row { display: flex; gap: 6px; align-items: center; }
+.rate-row input { flex: 1; }
+.btn-fetch {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.2s;
+}
+.btn-fetch:hover { background: var(--accent2); }
+.btn-fetch:disabled { background: var(--ink3); cursor: not-allowed; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink3);
+}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* SIGNATURE */
+.sig-wrapper {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: white;
+  margin-bottom: 12px;
+}
+#sigCanvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.sig-controls { display: flex; gap: 8px; padding: 10px; background: var(--surface2); }
+.sig-status { font-size: 12px; color: var(--ink3); padding: 4px 10px; align-self: center; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 16px;
+}
+.modal-img { width: 100%; border-radius: 8px; margin-bottom: 16px; }
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(0,0,0,0.4);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ACTION BUTTONS BOTTOM */
+.action-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  z-index: 90;
+}
+.action-bar .btn { flex: 1; justify-content: center; }
+
+/* TAG PILLS */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag-online { background: #dff5e7; color: #1a7a40; }
+.tag-offline { background: #fef3cd; color: #856404; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 9999;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
+  .expense-grid.g3, .expense-grid.g4 { grid-template-columns: 1fr 1fr; }
+  .expense-grid.g2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* SECTION TABS */
+.section-nav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--surface);
+  padding: 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.section-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink3);
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+}
+.section-tab.active {
+  background: var(--ink);
+  color: white;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>📋 Expense Report</h1>
+  <div class="header-actions">
+    <span id="onlineTag" class="tag tag-online">● Online</span>
+    <button class="btn-icon" onclick="newReport()">+ New</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- NAV TABS -->
+  <div class="section-nav">
+    <button class="section-tab active" onclick="showSection('settings')">⚙️ Settings</button>
+    <button class="section-tab" onclick="showSection('upload')">📎 Upload</button>
+    <button class="section-tab" onclick="showSection('expenses')">📊 Expenses</button>
+    <button class="section-tab" onclick="showSection('signature')">✍️ Sign</button>
+  </div>
+
+  <!-- OCR API BANNER -->
+  <div class="api-banner" id="apiBanner">
+    <div class="api-icon">🔑</div>
+    <div style="flex:1">
+      <p><strong>OCR.space API Key (optional)</strong><br>
+      For best OCR results when online, enter your free API key from <a href="https://ocr.space/OCRAPI" target="_blank">ocr.space/OCRAPI</a>. Without it, offline Tesseract OCR will be used.</p>
+      <div class="api-key-row">
+        <input type="text" id="ocrApiKey" placeholder="e.g. K12345678901234" />
+        <button class="btn btn-success btn-sm" onclick="saveApiKey()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: SETTINGS -->
+  <div class="section active" id="section-settings">
+    <div class="card">
+      <div class="card-title"><span class="icon">📄</span> Report Settings</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Report Name</label>
+          <input type="text" id="reportName" placeholder="e.g., Q2 2026 Kenya Mission" oninput="autoSave()">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="startDate" oninput="autoSave()">
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="date" id="endDate" oninput="autoSave()">
+        </div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Person Reporting</label>
+          <input type="text" id="personName" placeholder="Full name" oninput="autoSave()">
+        </div>
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" id="projectName" placeholder="Project name" oninput="autoSave()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Project ID</label>
+          <input type="text" id="projectId" placeholder="Project identification number" oninput="autoSave()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: UPLOAD -->
+  <div class="section" id="section-upload">
+    <div class="card">
+      <div class="card-title"><span class="icon">📎</span> Upload Receipts</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*,.pdf" multiple onchange="handleFiles(this.files)">
+        <div class="upload-icon">⬆️</div>
+        <p>Drop receipt images here or tap to upload</p>
+        <small>Supports JPG, PNG, PDF</small>
+      </div>
+      <div class="ocr-status" id="ocrStatus"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: EXPENSES -->
+  <div class="section" id="section-expenses">
+    <div class="card">
+      <div class="expenses-header">
+        <div class="expenses-count" id="expensesCount">Expenses (0)</div>
+        <button class="btn btn-outline btn-sm" onclick="addExpenseManually()">+ Add manually</button>
+      </div>
+
+      <div id="expensesList">
+        <div class="empty-state">
+          <div class="empty-icon">🧾</div>
+          <p>No expenses yet.<br>Upload receipts or add manually.</p>
+        </div>
+      </div>
+
+      <div class="total-bar" id="totalBar" style="display:none">
+        <span class="total-label">Total (EUR)</span>
+        <span class="total-amount" id="totalAmount">€0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: SIGNATURE -->
+  <div class="section" id="section-signature">
+    <div class="card">
+      <div class="card-title"><span class="icon">✍️</span> Signature</div>
+      <p style="font-size:13px; color:var(--ink2); margin-bottom:14px;">Draw your signature below. It will be included in the PDF export.</p>
+      <div class="sig-wrapper">
+        <canvas id="sigCanvas"></canvas>
+      </div>
+      <div class="sig-controls">
+        <button class="btn btn-outline btn-sm" onclick="clearSig()">🗑 Clear</button>
+        <button class="btn btn-success btn-sm" onclick="saveSig()">✓ Confirm</button>
+        <span class="sig-status" id="sigStatus">Not signed</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <button class="btn btn-success" onclick="exportPDF()">⬇ Export PDF</button>
+  <button class="btn btn-primary" onclick="exportODF()">📊 Export ODF</button>
+</div>
+
+<!-- RECEIPT VIEW MODAL -->
+<div class="modal-overlay" id="receiptModal" onclick="closeModal(event)">
+  <div style="position:relative; max-width:500px; width:100%">
+    <button class="modal-close" onclick="closeReceiptModal()">✕</button>
+    <img id="modalImg" class="modal-img" src="" alt="Receipt">
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- TESSERACT CDN -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let expenses = [];
+let signatureData = null;
+let ocrApiKey = '';
+let isOnline = navigator.onLine;
+
+const CURRENCIES = [
+  'EUR','USD','GBP','CHF','JPY','SEK','NOK','DKK',
+  'PLN','CZK','HUF','RON','BGN','HRK',
+  'MKD','ALL','MZN','KES','ZMW',
+  'TZS','UGX','RWF','ETB','GHS','NGN','XOF','MAD','TND'
+];
+
+const DEFAULT_RATES = {
+  EUR:1, USD:0.92, GBP:1.17, CHF:1.04, JPY:0.0062, SEK:0.088,
+  NOK:0.086, DKK:0.134, PLN:0.23, CZK:0.041, HUF:0.0026,
+  RON:0.20, BGN:0.51, HRK:0.133,
+  MKD:0.016, ALL:0.0095, MZN:0.014, KES:0.0071, ZMW:0.037,
+  TZS:0.00036, UGX:0.00025, RWF:0.00071, ETB:0.0065,
+  GHS:0.061, NGN:0.00058, XOF:0.00152, MAD:0.092, TND:0.296
+};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadState();
+  setupSignature();
+  setupDragDrop();
+  updateOnlineStatus();
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+});
+
+function updateOnlineStatus() {
+  isOnline = navigator.onLine;
+  const tag = document.getElementById('onlineTag');
+  tag.textContent = isOnline ? '● Online' : '● Offline';
+  tag.className = isOnline ? 'tag tag-online' : 'tag tag-offline';
+}
+
+// ─── SECTION NAV ─────────────────────────────────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ─── API KEY ──────────────────────────────────────────────────────────────────
+function saveApiKey() {
+  ocrApiKey = document.getElementById('ocrApiKey').value.trim();
+  if (ocrApiKey) {
+    localStorage.setItem('ocrApiKey', ocrApiKey);
+    document.getElementById('apiBanner').style.display = 'none';
+    showToast('✓ API key saved');
+  }
+}
+
+function loadApiKey() {
+  const saved = localStorage.getItem('ocrApiKey');
+  if (saved) {
+    ocrApiKey = saved;
+    document.getElementById('ocrApiKey').value = saved;
+    document.getElementById('apiBanner').style.display = 'none';
+  }
+}
+
+// ─── FILE UPLOAD & OCR ───────────────────────────────────────────────────────
+function setupDragDrop() {
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+async function handleFiles(files) {
+  for (const file of Array.from(files)) {
+    await processFile(file);
+  }
+}
+
+async function processFile(file) {
+  const status = document.getElementById('ocrStatus');
+  showOcrStatus('processing', `🔍 Processing ${file.name}...`);
+
+  // Read file as data URL for image
+  const dataUrl = await readFileAsDataURL(file);
+
+  let extracted = null;
+
+  if (isOnline && ocrApiKey && file.type !== 'application/pdf') {
+    try {
+      extracted = await ocrWithOcrSpace(file);
+      showOcrStatus('success', `✓ OCR.space extracted data from ${file.name}`);
+    } catch(e) {
+      console.warn('OCR.space failed, falling back to Tesseract:', e);
+      extracted = await ocrWithTesseract(dataUrl, file.name);
+    }
+  } else if (file.type !== 'application/pdf') {
+    extracted = await ocrWithTesseract(dataUrl, file.name);
+  } else {
+    showOcrStatus('success', `✓ PDF attached (manual data entry required)`);
+    extracted = {};
+  }
+
+  addExpense(extracted || {}, dataUrl);
+  showSection('expenses');
+  document.querySelectorAll('.section-tab')[2].classList.add('active');
+  document.querySelectorAll('.section-tab').forEach((t,i) => { if(i!==2) t.classList.remove('active'); });
+  setTimeout(() => { status.style.display = 'none'; }, 3000);
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function ocrWithOcrSpace(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('apikey', ocrApiKey);
+  formData.append('language', 'eng');
+  formData.append('isOverlayRequired', 'false');
+
+  const resp = await fetch('https://api.ocr.space/parse/image', {
+    method: 'POST',
+    body: formData
+  });
+  const data = await resp.json();
+  if (data.IsErroredOnProcessing) throw new Error(data.ErrorMessage);
+  const text = data.ParsedResults?.[0]?.ParsedText || '';
+  return parseReceiptText(text);
+}
+
+async function ocrWithTesseract(dataUrl, filename) {
+  showOcrStatus('processing', `🔍 Tesseract OCR processing ${filename}...`);
+  try {
+    const result = await Tesseract.recognize(dataUrl, 'eng', {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round(m.progress * 100);
+          showOcrStatus('processing', `🔍 Tesseract: ${pct}%`);
+        }
+      }
+    });
+    showOcrStatus('success', `✓ Tesseract OCR complete for ${filename}`);
+    return parseReceiptText(result.data.text);
+  } catch(e) {
+    showOcrStatus('error', `⚠ OCR failed — please enter data manually`);
+    return {};
+  }
+}
+
+function parseReceiptText(text) {
+  const extracted = {};
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+  // Try to find amount — look for patterns like 12.50, €12,50, etc.
+  const amountRegex = /(?:total|amount|sum|tot|totale|importo)[^\d]*(\d+[.,]\d{2})/i;
+  const fallbackAmountRegex = /\b(\d{1,6}[.,]\d{2})\b/g;
+
+  for (const line of lines) {
+    const m = line.match(amountRegex);
+    if (m) {
+      extracted.amount = parseFloat(m[1].replace(',', '.'));
+      break;
+    }
+  }
+  if (!extracted.amount) {
+    const allAmounts = [];
+    let m;
+    while ((m = fallbackAmountRegex.exec(text)) !== null) {
+      allAmounts.push(parseFloat(m[1].replace(',', '.')));
+    }
+    if (allAmounts.length) {
+      extracted.amount = Math.max(...allAmounts);
+    }
+  }
+
+  // Try to find date
+  const dateRegex = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/;
+  const dm = text.match(dateRegex);
+  if (dm) {
+    try {
+      const parts = dm[1].split(/[\/\-\.]/);
+      let y = parts[2], mo = parts[1], d = parts[0];
+      if (y && y.length === 2) y = '20' + y;
+      if (parseInt(parts[0]) > 31) { y = parts[0]; d = parts[2]; }
+      extracted.date = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    } catch(e) {}
+  }
+
+  return extracted;
+}
+
+function showOcrStatus(type, msg) {
+  const el = document.getElementById('ocrStatus');
+  el.className = 'ocr-status ' + type;
+  el.innerHTML = type === 'processing'
+    ? `<div class="spinner"></div> ${msg}`
+    : msg;
+  el.style.display = 'flex';
+}
+
+// ─── EXPENSES ─────────────────────────────────────────────────────────────────
+function addExpense(data = {}, receiptDataUrl = null) {
+  const today = new Date().toISOString().split('T')[0];
+  const expense = {
+    id: Date.now() + Math.random(),
+    date: data.date || today,
+    amount: data.amount || '',
+    currency: data.currency || 'EUR',
+    rate: data.rate || (data.currency ? (DEFAULT_RATES[data.currency] || 1) : 1),
+    amountEur: '',
+    budgetLine: '',
+    description: data.description || (data.amount ? 'Extracted expense' : ''),
+    docType: 'Receipt',
+    receipt: receiptDataUrl
+  };
+  expense.amountEur = expense.amount && expense.rate ? (parseFloat(expense.amount) * parseFloat(expense.rate)).toFixed(2) : '';
+  expenses.push(expense);
+  renderExpenses();
+  autoSave();
+}
+
+function addExpenseManually() {
+  addExpense({});
+  renderExpenses();
+  showToast('New expense added');
+}
+
+function removeExpense(id) {
+  expenses = expenses.filter(e => e.id !== id);
+  renderExpenses();
+  autoSave();
+}
+
+function updateExpense(id, field, value) {
+  const exp = expenses.find(e => e.id === id);
+  if (!exp) return;
+  exp[field] = value;
+  if (field === 'amount' || field === 'rate') {
+    const a = parseFloat(exp.amount);
+    const r = parseFloat(exp.rate);
+    exp.amountEur = (!isNaN(a) && !isNaN(r)) ? (a * r).toFixed(2) : '';
+  }
+  if (field === 'currency') {
+    exp.rate = DEFAULT_RATES[value] || 1;
+    exp.amountEur = exp.amount ? (parseFloat(exp.amount) * exp.rate).toFixed(2) : '';
+  }
+  renderExpenses();
+  autoSave();
+}
+
+async function fetchRate(id) {
+  const exp = expenses.find(e => e.id === id);
+  if (!exp) return;
+  const btn = document.querySelector(`[data-fetch="${id}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  try {
+    const date = exp.date || new Date().toISOString().split('T')[0];
+    const [y, m] = date.split('-');
+    const url = `https://api.frankfurter.app/${y}-${m}-01?from=${exp.currency}&to=EUR`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    const rate = data.rates?.EUR;
+    if (rate) {
+      exp.rate = rate;
+      exp.amountEur = exp.amount ? (parseFloat(exp.amount) * rate).toFixed(2) : '';
+      renderExpenses();
+      autoSave();
+      showToast(`✓ Rate fetched: 1 ${exp.currency} = €${rate}`);
+    } else {
+      showToast('Rate not found, using default');
+    }
+  } catch(e) {
+    // Try InforEuro fallback
+    try {
+      const inforeuroUrl = `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN`;
+      const resp = await fetch(inforeuroUrl);
+      const data = await resp.json();
+      const entry = data.find(r => r.isoA3Code === exp.currency);
+      if (entry) {
+        exp.rate = 1 / entry.value;
+        exp.amountEur = exp.amount ? (parseFloat(exp.amount) * exp.rate).toFixed(6) : '';
+        renderExpenses();
+        autoSave();
+        showToast(`✓ InforEuro rate: 1 EUR = ${entry.value} ${exp.currency}`);
+      } else {
+        showToast('⚠ Could not fetch rate');
+      }
+    } catch(e2) {
+      showToast('⚠ Offline — using default rate');
+    }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Fetch'; }
+}
+
+function renderExpenses() {
+  const list = document.getElementById('expensesList');
+  const countEl = document.getElementById('expensesCount');
+  const totalBar = document.getElementById('totalBar');
+  const totalEl = document.getElementById('totalAmount');
+
+  countEl.textContent = `Expenses (${expenses.length})`;
+
+  if (expenses.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🧾</div><p>No expenses yet.<br>Upload receipts or add manually.</p></div>`;
+    totalBar.style.display = 'none';
+    return;
+  }
+
+  let totalEur = 0;
+
+  list.innerHTML = expenses.map((exp, i) => {
+    const eur = parseFloat(exp.amountEur) || 0;
+    totalEur += eur;
+    const eurStr = eur > 0 ? `€${eur.toFixed(2)}` : '€—';
+
+    return `
+    <div class="expense-item" id="exp-${exp.id}">
+      <div class="expense-item-header">
+        <span class="expense-num">#${String(i+1).padStart(2,'0')}</span>
+        <span class="expense-eur">${eurStr}</span>
+        <button class="btn btn-danger btn-sm" onclick="removeExpense(${exp.id})">🗑</button>
+      </div>
+
+      <div class="expense-grid g2" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" value="${exp.date||''}" onchange="updateExpense(${exp.id},'date',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Currency</label>
+          <select onchange="updateExpense(${exp.id},'currency',this.value)">
+            ${CURRENCIES.map(c => `<option value="${c}" ${c===exp.currency?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="expense-grid g2" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Amount (local)</label>
+          <input type="number" step="0.01" value="${exp.amount||''}" placeholder="0.00"
+            onchange="updateExpense(${exp.id},'amount',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Conversion Rate</label>
+          <div class="rate-row">
+            <input type="number" step="0.000001" value="${exp.rate||''}" placeholder="1.00"
+              onchange="updateExpense(${exp.id},'rate',this.value)">
+            <button class="btn-fetch" data-fetch="${exp.id}" onclick="fetchRate(${exp.id})"
+              ${!isOnline?'disabled title="Offline"':''}>Fetch</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="expense-grid g2" style="margin-bottom:8px">
+        <div class="form-group">
+          <label>Budget Line</label>
+          <input type="text" value="${exp.budgetLine||''}" placeholder="e.g., Travel"
+            onchange="updateExpense(${exp.id},'budgetLine',this.value)">
+        </div>
+        <div class="form-group">
+          <label>Document Type</label>
+          <select onchange="updateExpense(${exp.id},'docType',this.value)">
+            ${['Receipt','Invoice','Ticket','Bill','Contract','Other'].map(d =>
+              `<option value="${d}" ${d===exp.docType?'selected':''}>${d}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:8px">
+        <label>Description</label>
+        <input type="text" value="${exp.description||''}" placeholder="Brief description"
+          onchange="updateExpense(${exp.id},'description',this.value)">
+      </div>
+
+      ${exp.receipt ? `
+      <div style="display:flex; align-items:center; gap:8px; margin-top:4px">
+        <img src="${exp.receipt}" class="receipt-thumb" onclick="viewReceipt('${exp.id}')" title="View receipt">
+        <span style="font-size:12px; color:var(--ink3)">Receipt attached</span>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  totalEl.textContent = `€${totalEur.toFixed(2)}`;
+  totalBar.style.display = 'flex';
+}
+
+function viewReceipt(id) {
+  const exp = expenses.find(e => String(e.id) === String(id));
+  if (exp && exp.receipt) {
+    document.getElementById('modalImg').src = exp.receipt;
+    document.getElementById('receiptModal').classList.add('open');
+  }
+}
+function closeReceiptModal() {
+  document.getElementById('receiptModal').classList.remove('open');
+}
+function closeModal(e) {
+  if (e.target.id === 'receiptModal') closeReceiptModal();
+}
+
+// ─── SIGNATURE ────────────────────────────────────────────────────────────────
+function setupSignature() {
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    if (e.touches) {
+      return [(e.touches[0].clientX - rect.left) * scaleX, (e.touches[0].clientY - rect.top) * scaleY];
+    }
+    return [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = 160;
+    ctx.strokeStyle = '#1a1a18';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  canvas.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('mousemove', e => {
+    if (!drawing) return;
+    const [x, y] = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!drawing) return;
+    const [x, y] = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    [lastX, lastY] = [x, y];
+  });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('touchend', () => drawing = false);
+}
+
+function clearSig() {
+  const canvas = document.getElementById('sigCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  signatureData = null;
+  document.getElementById('sigStatus').textContent = 'Not signed';
+  autoSave();
+}
+
+function saveSig() {
+  const canvas = document.getElementById('sigCanvas');
+  signatureData = canvas.toDataURL('image/png');
+  document.getElementById('sigStatus').textContent = '✓ Signature saved';
+  showToast('✓ Signature saved');
+  autoSave();
+}
+
+// ─── EXPORT PDF ──────────────────────────────────────────────────────────────
+async function exportPDF() {
+  if (expenses.length === 0) { showToast('⚠ No expenses to export'); return; }
+  if (!signatureData) {
+    const go = confirm('No signature saved. Export anyway?');
+    if (!go) { showSection('signature'); return; }
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const reportName = document.getElementById('reportName').value || 'Expense Report';
+  const personName = document.getElementById('personName').value || '';
+  const projectName = document.getElementById('projectName').value || '';
+  const projectId = document.getElementById('projectId').value || '';
+  const startDate = document.getElementById('startDate').value || '';
+  const endDate = document.getElementById('endDate').value || '';
+
+  // Header
+  doc.setFillColor(26, 31, 46);
+  doc.rect(0, 0, 210, 32, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text(reportName, 14, 14);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  let headerLine = '';
+  if (personName) headerLine += `Reported by: ${personName}   `;
+  if (projectName) headerLine += `Project: ${projectName}   `;
+  if (projectId) headerLine += `ID: ${projectId}   `;
+  if (startDate || endDate) headerLine += `Period: ${startDate} – ${endDate}`;
+  doc.text(headerLine.trim(), 14, 22);
+  doc.setFontSize(8);
+  doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, 14, 28);
+
+  doc.setTextColor(0, 0, 0);
+
+  // Table
+  const tableData = expenses.map((e, i) => [
+    String(i + 1),
+    e.date || '',
+    e.amount ? String(e.amount) : '',
+    e.currency || '',
+    e.rate ? String(parseFloat(e.rate).toFixed(4)) : '',
+    e.amountEur ? `€${parseFloat(e.amountEur).toFixed(2)}` : '',
+    e.budgetLine || '',
+    e.docType || '',
+    e.description || ''
+  ]);
+
+  const totalEur = expenses.reduce((s, e) => s + (parseFloat(e.amountEur) || 0), 0);
+  tableData.push(['', '', '', '', 'TOTAL', `€${totalEur.toFixed(2)}`, '', '', '']);
+
+  doc.autoTable({
+    startY: 38,
+    head: [['#', 'Date', 'Amount', 'Cur.', 'Rate', 'EUR', 'Budget', 'Doc', 'Description']],
+    body: tableData,
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [45, 90, 61], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [248, 246, 242] },
+    columnStyles: { 8: { cellWidth: 35 } },
+    margin: { left: 14, right: 14 }
+  });
+
+  let y = doc.lastAutoTable.finalY + 10;
+
+  // Signature
+  if (signatureData) {
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Signature:', 14, y);
+    y += 4;
+    doc.addImage(signatureData, 'PNG', 14, y, 60, 20);
+    y += 22;
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(personName || 'Reporting Person', 14, y);
+    y += 8;
+  }
+
+  // Receipts
+  const receiptsWithImg = expenses.filter(e => e.receipt && !e.receipt.startsWith('data:application/pdf'));
+  if (receiptsWithImg.length > 0) {
+    if (y > 240) { doc.addPage(); y = 14; }
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Attached Receipts', 14, y);
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+
+    for (let i = 0; i < receiptsWithImg.length; i++) {
+      const exp = receiptsWithImg[i];
+      const expIdx = expenses.indexOf(exp);
+      if (y > 240) { doc.addPage(); y = 14; }
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Receipt #${expIdx + 1} — ${exp.date || ''} — ${exp.description || ''}`, 14, y);
+      y += 3;
+      try {
+        doc.addImage(exp.receipt, 'JPEG', 14, y, 80, 55);
+      } catch(e) {
+        try { doc.addImage(exp.receipt, 'PNG', 14, y, 80, 55); } catch(e2) {}
+      }
+      y += 60;
+    }
+  }
+
+  doc.save(`${reportName.replace(/\s+/g, '_')}_expense_report.pdf`);
+  showToast('✓ PDF exported');
+}
+
+// ─── EXPORT ODF (as CSV wrapped in .ods-like format) ─────────────────────────
+function exportODF() {
+  if (expenses.length === 0) { showToast('⚠ No expenses to export'); return; }
+
+  const reportName = document.getElementById('reportName').value || 'Expense Report';
+  const personName = document.getElementById('personName').value || '';
+  const projectName = document.getElementById('projectName').value || '';
+  const projectId = document.getElementById('projectId').value || '';
+  const startDate = document.getElementById('startDate').value || '';
+  const endDate = document.getElementById('endDate').value || '';
+
+  // Build CSV (Excel/LibreOffice compatible)
+  const lines = [];
+  lines.push(['EXPENSE REPORT']);
+  lines.push([`Report Name:`, reportName]);
+  lines.push([`Person Reporting:`, personName]);
+  lines.push([`Project:`, projectName]);
+  lines.push([`Project ID:`, projectId]);
+  lines.push([`Period:`, `${startDate} – ${endDate}`]);
+  lines.push([`Generated:`, new Date().toLocaleDateString('en-GB')]);
+  lines.push([]);
+  lines.push(['#','Date','Amount (Local)','Currency','Conversion Rate','Amount (EUR)','Budget Line','Document Type','Description']);
+
+  let totalEur = 0;
+  expenses.forEach((e, i) => {
+    const eur = parseFloat(e.amountEur) || 0;
+    totalEur += eur;
+    lines.push([
+      i + 1,
+      e.date || '',
+      e.amount || '',
+      e.currency || '',
+      e.rate || '',
+      eur.toFixed(2),
+      e.budgetLine || '',
+      e.docType || '',
+      e.description || ''
+    ]);
+  });
+  lines.push([]);
+  lines.push(['', '', '', '', 'TOTAL (EUR)', totalEur.toFixed(2)]);
+
+  const csv = lines.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${reportName.replace(/\s+/g, '_')}_expense_report.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ ODF/CSV exported (opens in Excel & LibreOffice)');
+}
+
+// ─── NEW REPORT ───────────────────────────────────────────────────────────────
+function newReport() {
+  if (expenses.length > 0) {
+    if (!confirm('Start a new report? Current data will be cleared.')) return;
+  }
+  expenses = [];
+  signatureData = null;
+  document.getElementById('reportName').value = '';
+  document.getElementById('startDate').value = '';
+  document.getElementById('endDate').value = '';
+  document.getElementById('personName').value = '';
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectId').value = '';
+  document.getElementById('sigStatus').textContent = 'Not signed';
+  clearSig();
+  renderExpenses();
+  autoSave();
+  showToast('New report started');
+}
+
+// ─── PERSIST ──────────────────────────────────────────────────────────────────
+function autoSave() {
+  const state = {
+    reportName: document.getElementById('reportName').value,
+    startDate: document.getElementById('startDate').value,
+    endDate: document.getElementById('endDate').value,
+    personName: document.getElementById('personName').value,
+    projectName: document.getElementById('projectName').value,
+    projectId: document.getElementById('projectId').value,
+    expenses,
+    signatureData
+  };
+  try { localStorage.setItem('expenseReportState', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  loadApiKey();
+  try {
+    const raw = localStorage.getItem('expenseReportState');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    document.getElementById('reportName').value = state.reportName || '';
+    document.getElementById('startDate').value = state.startDate || '';
+    document.getElementById('endDate').value = state.endDate || '';
+    document.getElementById('personName').value = state.personName || '';
+    document.getElementById('projectName').value = state.projectName || '';
+    document.getElementById('projectId').value = state.projectId || '';
+    expenses = state.expenses || [];
+    signatureData = state.signatureData || null;
+    if (signatureData) {
+      document.getElementById('sigStatus').textContent = '✓ Signature saved';
+      const canvas = document.getElementById('sigCanvas');
+      const img = new Image();
+      img.onload = () => canvas.getContext('2d').drawImage(img, 0, 0);
+      img.src = signatureData;
+    }
+    renderExpenses();
+  } catch(e) { console.warn('Could not load state', e); }
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
+<!-- PWA SERVICE WORKER REGISTRATION -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
