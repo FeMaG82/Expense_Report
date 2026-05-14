@@ -353,9 +353,9 @@ input::placeholder { color: var(--ink3); }
 #sigCanvas {
   display: block;
   width: 100%;
-  height: 160px;
   cursor: crosshair;
   touch-action: none;
+  background: white;
 }
 .sig-controls { display: flex; gap: 8px; padding: 10px; background: var(--surface2); }
 .sig-status { font-size: 12px; color: var(--ink3); padding: 4px 10px; align-self: center; }
@@ -680,8 +680,9 @@ function showSection(name) {
   document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('section-' + name).classList.add('active');
   event.currentTarget.classList.add('active');
-  if (name === 'signature' && window._initSigCanvas) {
-    setTimeout(window._initSigCanvas, 50);
+  if (name === 'signature') {
+    // Small delay to ensure the section is rendered and has real dimensions
+    setTimeout(initSigCanvas, 80);
   }
 }
 
@@ -1052,89 +1053,79 @@ function closeModal(e) {
 
 // ─── SIGNATURE ────────────────────────────────────────────────────────────────
 function setupSignature() {
+  // Intentionally empty — signature is initialized lazily when tab is opened
+}
+
+function initSigCanvas() {
   const canvas = document.getElementById('sigCanvas');
+  if (canvas._sigReady) return; // already set up
+  canvas._sigReady = true;
+
+  // Set pixel dimensions explicitly
+  canvas.width = canvas.offsetWidth || 320;
+  canvas.height = 180;
+
   const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#1a1a18';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
   let drawing = false;
   let lastX = 0, lastY = 0;
 
-  function initCanvas() {
-    // Must be called when canvas is actually visible
-    const w = canvas.offsetWidth || canvas.parentElement.offsetWidth || 340;
-    canvas.width = w;
-    canvas.height = 160;
-    ctx.strokeStyle = '#1a1a18';
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  }
-
-  function getPos(e) {
+  function getXY(e) {
     const rect = canvas.getBoundingClientRect();
-    if (e.touches && e.touches.length > 0) {
-      return [
-        e.touches[0].clientX - rect.left,
-        e.touches[0].clientY - rect.top
-      ];
+    if (e.changedTouches) {
+      const t = e.changedTouches[0];
+      return [t.clientX - rect.left, t.clientY - rect.top];
     }
     return [e.clientX - rect.left, e.clientY - rect.top];
   }
 
-  // Init when signature tab is shown
-  window._initSigCanvas = function() {
-    initCanvas();
-  };
-
-  // Also init on load in case it's already visible
-  setTimeout(initCanvas, 100);
-  window.addEventListener('resize', initCanvas);
-
-  canvas.addEventListener('mousedown', e => {
+  function start(e) {
     e.preventDefault();
-    initCanvas();
     drawing = true;
-    [lastX, lastY] = getPos(e);
-  });
+    [lastX, lastY] = getXY(e);
+    // Draw a dot for single tap/click
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 1, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1a18';
+    ctx.fill();
+  }
 
-  canvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    initCanvas();
-    drawing = true;
-    [lastX, lastY] = getPos(e);
-  }, { passive: false });
-
-  canvas.addEventListener('mousemove', e => {
+  function move(e) {
     e.preventDefault();
     if (!drawing) return;
-    const [x, y] = getPos(e);
+    const [x, y] = getXY(e);
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-    [lastX, lastY] = [x, y];
-  });
+    lastX = x; lastY = y;
+  }
 
-  canvas.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if (!drawing) return;
-    const [x, y] = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    [lastX, lastY] = [x, y];
-  }, { passive: false });
+  function stop(e) {
+    drawing = false;
+  }
 
-  canvas.addEventListener('mouseup', () => drawing = false);
-  canvas.addEventListener('mouseleave', () => drawing = false);
-  canvas.addEventListener('touchend', () => drawing = false);
-  canvas.addEventListener('touchcancel', () => drawing = false);
+  canvas.addEventListener('mousedown',  start, false);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('mousemove',  move,  false);
+  canvas.addEventListener('touchmove',  move,  { passive: false });
+  canvas.addEventListener('mouseup',    stop,  false);
+  canvas.addEventListener('mouseleave', stop,  false);
+  canvas.addEventListener('touchend',   stop,  false);
+  canvas.addEventListener('touchcancel',stop,  false);
 }
 
 function clearSig() {
   const canvas = document.getElementById('sigCanvas');
   canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  canvas._sigReady = false;
   signatureData = null;
   document.getElementById('sigStatus').textContent = 'Not signed';
+  setTimeout(initSigCanvas, 50);
   autoSave();
 }
 
