@@ -12,15 +12,19 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- JSZip for ODS generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-:root {
-  --bg:#f4f1eb; --surface:#fff; --surface2:#f9f7f3;
-  --ink:#1a1a18; --ink2:#5a5a52; --ink3:#9a9a8e;
-  --accent:#2d5a3d; --accent2:#4a8c60; --accent-light:#e8f3ec;
-  --danger:#c0392b; --danger-light:#fdf0ef;
-  --border:#e2ddd6; --shadow:0 2px 12px rgba(26,26,24,.08);
+:root{
+  --bg:#f4f1eb;--surface:#fff;--surface2:#f9f7f3;
+  --ink:#1a1a18;--ink2:#5a5a52;--ink3:#9a9a8e;
+  --accent:#2d5a3d;--accent2:#4a8c60;--accent-light:#e8f3ec;
+  --danger:#c0392b;--danger-light:#fdf0ef;
+  --warn:#d4860a;--warn-light:#fff3e0;
+  --blue:#1d4ed8;--blue-light:#eff6ff;
+  --border:#e2ddd6;--shadow:0 2px 12px rgba(26,26,24,.08);
   --shadow-lg:0 8px 32px rgba(26,26,24,.12);
-  --radius:12px; --radius-sm:8px;
+  --radius:12px;--radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.5}
@@ -28,7 +32,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 .app-header{background:var(--ink);color:#fff;padding:0 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 2px 16px rgba(0,0,0,.2)}
 .app-header h1{font-family:'DM Serif Display',serif;font-size:1.1rem}
 .header-actions{display:flex;gap:8px;align-items:center}
-.btn-icon{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s;white-space:nowrap}
+.btn-icon{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;white-space:nowrap}
 .btn-icon:hover{background:rgba(255,255,255,.22)}
 
 .main{max-width:700px;margin:0 auto;padding:16px 14px 82px}
@@ -38,6 +42,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-
 
 .form-row{display:grid;gap:10px;margin-bottom:10px}
 .form-row.c2{grid-template-columns:1fr 1fr}
+.form-row.c3{grid-template-columns:1fr 1fr 1fr}
 .form-group{display:flex;flex-direction:column;gap:4px}
 label{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
 input,select,textarea{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--surface2);transition:border-color .2s;width:100%}
@@ -49,15 +54,19 @@ input::placeholder{color:var(--ink3)}
 .btn-success{background:var(--accent);color:#fff}.btn-success:hover{background:var(--accent2)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--ink2)}.btn-outline:hover{border-color:var(--ink2);color:var(--ink)}
 .btn-danger{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2}.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-warn{background:var(--warn-light);color:var(--warn);border:1px solid #f5d9a0}.btn-warn:hover{background:var(--warn);color:#fff}
+.btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid #bfd7ff}.btn-blue:hover{background:var(--blue);color:#fff}
 .btn-sm{padding:6px 10px;font-size:12px}
 .btn-full{width:100%;justify-content:center}
 
+/* API BANNER */
 .api-banner{background:#fff8e6;border:1.5px solid #f0c060;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px}
 .api-banner p{font-size:13px;color:#7a5a00;margin-bottom:8px}
 .api-banner a{color:var(--accent);font-weight:600}
 .api-key-row{display:flex;gap:8px}
 .api-key-row input{flex:1;font-family:monospace;font-size:13px}
 
+/* UPLOAD */
 .upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);position:relative}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -72,20 +81,51 @@ input::placeholder{color:var(--ink3)}
 .spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.expenses-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.expenses-count{font-family:'DM Serif Display',serif;font-size:1.05rem}
-.total-bar{background:var(--ink);color:#fff;border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-.total-bar .tl{font-size:13px;opacity:.7}
-.total-bar .ta{font-family:'DM Serif Display',serif;font-size:1.25rem}
+/* BALANCE PANEL */
+.balance-panel{background:var(--ink);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.balance-panel h3{font-family:'DM Serif Display',serif;font-size:1rem;margin-bottom:12px;opacity:.8}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.balance-item{background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px}
+.balance-item.full{grid-column:1/-1}
+.balance-item label{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px}
+.balance-item .val{font-family:'DM Serif Display',serif;font-size:1.15rem}
+.balance-final{border-radius:8px;padding:12px 14px;margin-top:4px}
+.balance-final.positive{background:#1a5c30}
+.balance-final.negative{background:#7a1a1a}
+.balance-final.zero{background:rgba(255,255,255,.1)}
+.balance-final .bf-amount{font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:2px}
+.balance-final .bf-note{font-size:12px;opacity:.8;font-style:italic}
 
-/* COMPACT EXPENSE ROW */
-.exp-row{display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:8px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+/* CURRENCY BALANCES */
+.cur-balances{margin-top:10px}
+.cur-bal-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.cur-bal-row:last-child{border-bottom:none}
+.cur-bal-row .cname{opacity:.7}
+.cur-bal-row .camount{font-weight:600}
+.cur-bal-row .camount.neg{color:#ff9999}
+
+/* MOVEMENT ROWS */
+.expenses-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.expenses-count{font-family:'DM Serif Display',serif;font-size:1.05rem}
+.add-btns{display:flex;gap:6px;flex-wrap:wrap}
+
+.exp-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:7px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
 .exp-row:hover,.exp-row:active{border-color:var(--accent);background:var(--accent-light)}
+.exp-row.type-advance{border-left:3px solid #1d9e5c}
+.exp-row.type-exchange{border-left:3px solid #1d4ed8}
+.exp-row.type-expense{border-left:3px solid var(--border)}
 .exp-num{font-size:11px;font-weight:700;color:var(--ink3);min-width:26px}
-.exp-date{font-size:12px;color:var(--ink2);min-width:82px;flex-shrink:0}
+.exp-type-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.badge-expense{background:#f0f0ea;color:var(--ink2)}
+.badge-advance{background:#d4f5e4;color:#1a6e3c}
+.badge-exchange{background:#dbeafe;color:#1d4ed8}
+.exp-date{font-size:12px;color:var(--ink2);min-width:78px;flex-shrink:0}
 .exp-desc{flex:1;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exp-rcpt{font-size:13px;flex-shrink:0}
-.exp-eur{font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--accent);min-width:66px;text-align:right;flex-shrink:0}
+.exp-eur{font-family:'DM Serif Display',serif;font-size:.95rem;min-width:70px;text-align:right;flex-shrink:0}
+.exp-eur.pos{color:#1a6e3c}
+.exp-eur.neg{color:var(--danger)}
+.exp-eur.exc{color:var(--blue)}
 .exp-arrow{color:var(--ink3);font-size:14px;flex-shrink:0}
 
 .empty-state{text-align:center;padding:36px 20px;color:var(--ink3)}
@@ -106,7 +146,6 @@ input::placeholder{color:var(--ink3)}
 .modal-close{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);color:var(--ink2);border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--danger-light);color:var(--danger)}
 
-/* RECEIPTS IN MODAL */
 .receipts-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .rcpt-wrap{position:relative}
 .rcpt-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;border:1.5px solid var(--border);cursor:pointer;display:block}
@@ -144,13 +183,15 @@ input::placeholder{color:var(--ink3)}
 .section{display:none}
 .section.active{display:block}
 
-/* IMG PREVIEW */
 .img-prev-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px}
 .img-prev-overlay.open{display:flex}
 .img-prev-overlay img{max-width:100%;max-height:90vh;border-radius:8px;object-fit:contain}
 .img-prev-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-@media(max-width:560px){.form-row.c2{grid-template-columns:1fr}}
+/* DIVIDER */
+.list-divider{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:8px 4px 4px;margin-bottom:2px}
+
+@media(max-width:560px){.form-row.c2,.form-row.c3{grid-template-columns:1fr}.add-btns .btn-sm{font-size:11px;padding:5px 8px}}
 </style>
 </head>
 <body>
@@ -167,7 +208,7 @@ input::placeholder{color:var(--ink3)}
   <div class="section-nav">
     <button class="section-tab active" onclick="showSection('settings',this)">⚙️ Settings</button>
     <button class="section-tab" onclick="showSection('upload',this)">📎 Upload</button>
-    <button class="section-tab" onclick="showSection('expenses',this)">📊 Expenses</button>
+    <button class="section-tab" onclick="showSection('expenses',this)">📊 Movements</button>
     <button class="section-tab" onclick="showSection('signature',this)">✍️ Sign</button>
   </div>
 
@@ -188,10 +229,7 @@ input::placeholder{color:var(--ink3)}
     <div class="card">
       <div class="card-title">📄 Report Settings</div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Report Name</label>
-          <input type="text" id="reportName" placeholder="e.g., Q2 2026 Kenya Mission" oninput="autoSave()">
-        </div>
+        <div class="form-group"><label>Report Name</label><input type="text" id="reportName" placeholder="e.g., Q2 2026 Kenya Mission" oninput="autoSave()"></div>
       </div>
       <div class="form-row c2">
         <div class="form-group"><label>Start Date</label><input type="date" id="startDate" oninput="autoSave()"></div>
@@ -207,7 +245,7 @@ input::placeholder{color:var(--ink3)}
     </div>
     <div class="card">
       <div class="card-title">🌍 Mission Countries</div>
-      <p style="font-size:13px;color:var(--ink2);margin-bottom:12px">Select up to 3 countries. Currency will be preset automatically for new expenses.</p>
+      <p style="font-size:13px;color:var(--ink2);margin-bottom:12px">Select up to 3 countries. Currency will be preset for new expenses.</p>
       <div class="countries-row">
         <div class="country-slot"><select id="country0" onchange="updateCountry(0,this.value)"><option value="">— Country 1 —</option></select><span class="ctag" id="ctag0"></span></div>
         <div class="country-slot"><select id="country1" onchange="updateCountry(1,this.value)"><option value="">— Country 2 (optional) —</option></select><span class="ctag" id="ctag1"></span></div>
@@ -230,19 +268,39 @@ input::placeholder{color:var(--ink3)}
     </div>
   </div>
 
-  <!-- EXPENSES -->
+  <!-- MOVEMENTS -->
   <div class="section" id="section-expenses">
+    <!-- BALANCE PANEL -->
+    <div class="balance-panel" id="balancePanel" style="display:none">
+      <h3>📊 Balance Summary</h3>
+      <div class="balance-grid">
+        <div class="balance-item">
+          <label>Total Advances (EUR)</label>
+          <div class="val" id="bTotalAdvance">€0.00</div>
+        </div>
+        <div class="balance-item">
+          <label>Total Expenses (EUR)</label>
+          <div class="val" id="bTotalExpense">€0.00</div>
+        </div>
+      </div>
+      <div class="balance-final" id="bFinal">
+        <div class="bf-amount" id="bFinalAmount">€0.00</div>
+        <div class="bf-note" id="bFinalNote"></div>
+      </div>
+      <div class="cur-balances" id="curBalances"></div>
+    </div>
+
     <div class="card">
       <div class="expenses-header">
-        <div class="expenses-count" id="expensesCount">Expenses (0)</div>
-        <button class="btn btn-outline btn-sm" onclick="addExpenseManually()">+ Add manually</button>
+        <div class="expenses-count" id="expensesCount">Movements (0)</div>
+        <div class="add-btns">
+          <button class="btn btn-success btn-sm" onclick="addAdvance()">💰 Advance</button>
+          <button class="btn btn-blue btn-sm" onclick="addExchange()">↔ Exchange</button>
+          <button class="btn btn-outline btn-sm" onclick="addExpenseManually()">+ Expense</button>
+        </div>
       </div>
       <div id="expensesList">
-        <div class="empty-state"><div class="ei">🧾</div><p>No expenses yet.<br>Upload receipts or add manually.</p></div>
-      </div>
-      <div class="total-bar" id="totalBar" style="display:none">
-        <span class="tl">Total (EUR)</span>
-        <span class="ta" id="totalAmount">€0.00</span>
+        <div class="empty-state"><div class="ei">🧾</div><p>No movements yet.<br>Add a cash advance to start.</p></div>
       </div>
     </div>
   </div>
@@ -264,14 +322,14 @@ input::placeholder{color:var(--ink3)}
 
 <div class="action-bar">
   <button class="btn btn-success" onclick="exportPDF()">⬇ Export PDF</button>
-  <button class="btn btn-primary" onclick="exportODF()">📊 Export ODF</button>
+  <button class="btn btn-primary" onclick="exportODS()">📊 Export ODS</button>
 </div>
 
-<!-- EXPENSE DETAIL MODAL -->
+<!-- MOVEMENT DETAIL MODAL -->
 <div class="modal-overlay" id="expModal">
   <div class="modal">
     <button class="modal-close" onclick="closeExpModal()">✕</button>
-    <div class="modal-title" id="expModalTitle">Expense #01</div>
+    <div class="modal-title" id="expModalTitle">Movement</div>
     <div id="expModalBody"></div>
   </div>
 </div>
@@ -286,22 +344,26 @@ input::placeholder{color:var(--ink3)}
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-const COUNTRY_LIST = [
-  {name:'Albania',       currency:'ALL', flag:'🇦🇱'},
-  {name:'Italy',         currency:'EUR', flag:'🇮🇹'},
-  {name:'Kenya',         currency:'KES', flag:'🇰🇪'},
-  {name:'Kosovo',        currency:'EUR', flag:'🇽🇰'},
-  {name:'Lebanon',       currency:'USD', flag:'🇱🇧'},
-  {name:'Mozambique',    currency:'MZN', flag:'🇲🇿'},
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const COUNTRY_LIST=[
+  {name:'Albania',currency:'ALL',flag:'🇦🇱'},
+  {name:'Italy',currency:'EUR',flag:'🇮🇹'},
+  {name:'Kenya',currency:'KES',flag:'🇰🇪'},
+  {name:'Kosovo',currency:'EUR',flag:'🇽🇰'},
+  {name:'Lebanon',currency:'USD',flag:'🇱🇧'},
+  {name:'Mozambique',currency:'MZN',flag:'🇲🇿'},
   {name:'North Macedonia',currency:'MKD',flag:'🇲🇰'},
-  {name:'South Africa',  currency:'ZAR', flag:'🇿🇦'},
-  {name:'Zambia',        currency:'ZMW', flag:'🇿🇲'},
+  {name:'South Africa',currency:'ZAR',flag:'🇿🇦'},
+  {name:'Zambia',currency:'ZMW',flag:'🇿🇲'},
 ];
 const CURRENCIES=['EUR','USD','GBP','CHF','JPY','SEK','NOK','DKK','PLN','CZK','HUF','RON','BGN','MKD','ALL','MZN','KES','ZMW','ZAR','TZS','UGX','RWF','ETB','GHS','NGN','MAD','TND'];
 const DEFAULT_RATES={EUR:1,USD:0.92,GBP:1.17,CHF:1.04,JPY:0.0062,SEK:0.088,NOK:0.086,DKK:0.134,PLN:0.23,CZK:0.041,HUF:0.0026,RON:0.20,BGN:0.51,MKD:0.016,ALL:0.0095,MZN:0.014,KES:0.0071,ZMW:0.037,ZAR:0.051,TZS:0.00036,UGX:0.00025,RWF:0.00071,ETB:0.0065,GHS:0.061,NGN:0.00058,MAD:0.092,TND:0.296};
 
-let expenses=[], signatureData=null, ocrApiKey='', isOnline=navigator.onLine, missionCountries=['','',''], sigReady=false;
+// ── STATE ─────────────────────────────────────────────────────────────────────
+// movement types: 'expense' | 'advance' | 'exchange'
+let movements=[], signatureData=null, ocrApiKey='', isOnline=navigator.onLine, missionCountries=['','',''], sigReady=false;
 
+// ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
   buildCountryDropdowns();
   loadState();
@@ -326,7 +388,7 @@ function showSection(name,btn){
   if(name==='signature') setTimeout(initSig,80);
 }
 
-// ── COUNTRIES ────────────────────────────────────────────────────────────────
+// ── COUNTRIES ─────────────────────────────────────────────────────────────────
 function buildCountryDropdowns(){
   for(let i=0;i<3;i++){
     const sel=document.getElementById('country'+i);
@@ -347,7 +409,7 @@ function defaultCurrency(){
   return 'EUR';
 }
 
-// ── API KEY ──────────────────────────────────────────────────────────────────
+// ── API KEY ───────────────────────────────────────────────────────────────────
 function saveApiKey(){
   ocrApiKey=document.getElementById('ocrApiKey').value.trim();
   if(ocrApiKey){localStorage.setItem('ocrApiKey',ocrApiKey);document.getElementById('apiBanner').style.display='none';showToast('✓ API key saved');}
@@ -357,7 +419,7 @@ function loadApiKey(){
   if(s){ocrApiKey=s;document.getElementById('ocrApiKey').value=s;document.getElementById('apiBanner').style.display='none';}
 }
 
-// ── UPLOAD / OCR ─────────────────────────────────────────────────────────────
+// ── UPLOAD / OCR ──────────────────────────────────────────────────────────────
 function setupDragDrop(){
   const z=document.getElementById('uploadZone');
   z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over');});
@@ -366,7 +428,7 @@ function setupDragDrop(){
 }
 async function handleFiles(files){for(const f of Array.from(files)) await processFile(f);}
 
-async function processFile(file, addToId=null){
+async function processFile(file,addToId=null){
   showOcrSt('processing',`🔍 Processing ${file.name}...`);
   const dataUrl=await toDataUrl(file);
   let ex={};
@@ -378,10 +440,10 @@ async function processFile(file, addToId=null){
   } else showOcrSt('success','✓ PDF attached');
 
   if(addToId!==null){
-    const exp=expenses.find(e=>e.id===addToId);
-    if(exp){exp.receipts.push(dataUrl);renderExpenses();renderModal(addToId);autoSave();}
+    const mv=movements.find(m=>m.id===addToId);
+    if(mv){mv.receipts.push(dataUrl);renderMovements();renderModal(addToId);autoSave();}
   } else {
-    addExpense(ex,dataUrl);
+    addExpenseMove(ex,dataUrl);
     document.querySelectorAll('.section-tab')[2].click();
   }
   setTimeout(()=>{document.getElementById('ocrStatus').style.display='none';},3000);
@@ -421,127 +483,330 @@ function showOcrSt(type,msg){
   el.style.display='flex';
 }
 
-// ── EXPENSES ─────────────────────────────────────────────────────────────────
-function addExpense(data={},rcpt=null){
-  const today=new Date().toISOString().split('T')[0];
+// ── MOVEMENTS ─────────────────────────────────────────────────────────────────
+function mkId(){return Date.now()+Math.random();}
+const today=()=>new Date().toISOString().split('T')[0];
+
+function addExpenseMove(data={},rcpt=null){
   const cur=data.currency||defaultCurrency();
   const rate=DEFAULT_RATES[cur]||1;
-  const exp={id:Date.now()+Math.random(),date:data.date||today,amount:data.amount||'',currency:cur,rate,amountEur:'',budgetLine:'',description:data.amount?'Extracted expense':'',docType:'Receipt',receipts:rcpt?[rcpt]:[]};
-  exp.amountEur=exp.amount?(parseFloat(exp.amount)*rate).toFixed(2):'';
-  expenses.push(exp);renderExpenses();autoSave();
+  const mv={id:mkId(),type:'expense',date:data.date||today(),amount:data.amount||'',currency:cur,rate,amountEur:'',budgetLine:'',description:data.amount?'Extracted expense':'',docType:'Receipt',receipts:rcpt?[rcpt]:[]};
+  mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(2):'';
+  movements.push(mv);renderMovements();autoSave();
 }
-function addExpenseManually(){addExpense({});showToast('New expense added — tap to edit');}
-function removeExpense(id){
-  if(!confirm('Delete this expense?'))return;
-  expenses=expenses.filter(e=>e.id!==id);renderExpenses();autoSave();closeExpModal();
+
+function addAdvance(){
+  const mv={id:mkId(),type:'advance',date:today(),amount:'',currency:defaultCurrency(),rate:DEFAULT_RATES[defaultCurrency()]||1,amountEur:'',description:'Cash advance',receipts:[]};
+  movements.push(mv);renderMovements();autoSave();
+  openModal(mv.id);
 }
+
+function addExchange(){
+  const mv={id:mkId(),type:'exchange',date:today(),
+    fromCurrency:defaultCurrency(),fromAmount:'',
+    toCurrency:'EUR',toAmount:'',
+    rate:'',description:'Currency exchange',receipts:[]};
+  movements.push(mv);renderMovements();autoSave();
+  openModal(mv.id);
+}
+
+function addExpenseManually(){addExpenseMove({});showToast('New expense — tap row to edit');}
+
+function removeMovement(id){
+  if(!confirm('Delete this movement?'))return;
+  movements=movements.filter(m=>m.id!==id);
+  renderMovements();autoSave();closeExpModal();
+}
+
 function updField(id,field,val){
-  const exp=expenses.find(e=>e.id===id);if(!exp)return;
-  exp[field]=val;
-  if(field==='amount'||field==='rate'){const a=parseFloat(exp.amount),r=parseFloat(exp.rate);exp.amountEur=(!isNaN(a)&&!isNaN(r))?(a*r).toFixed(2):'';}
-  if(field==='currency'){exp.rate=DEFAULT_RATES[val]||1;exp.amountEur=exp.amount?(parseFloat(exp.amount)*exp.rate).toFixed(2):'';}
-  renderExpenses();autoSave();
-  const el=document.getElementById('meur-'+id);if(el) el.textContent=exp.amountEur?`€${parseFloat(exp.amountEur).toFixed(2)}`:'€—';
+  const mv=movements.find(m=>m.id===id);if(!mv)return;
+  mv[field]=val;
+  if(mv.type==='expense'){
+    if(field==='amount'||field==='rate'){const a=parseFloat(mv.amount),r=parseFloat(mv.rate);mv.amountEur=(!isNaN(a)&&!isNaN(r))?(a*r).toFixed(2):'';}
+    if(field==='currency'){mv.rate=DEFAULT_RATES[val]||1;mv.amountEur=mv.amount?(parseFloat(mv.amount)*mv.rate).toFixed(2):'';}
+  }
+  if(mv.type==='advance'){
+    if(field==='amount'||field==='rate'){const a=parseFloat(mv.amount),r=parseFloat(mv.rate);mv.amountEur=(!isNaN(a)&&!isNaN(r))?(a*r).toFixed(2):'';}
+    if(field==='currency'){mv.rate=DEFAULT_RATES[val]||1;mv.amountEur=mv.amount?(parseFloat(mv.amount)*mv.rate).toFixed(2):'';}
+  }
+  if(mv.type==='exchange'){
+    // auto-calculate toAmount if rate and fromAmount are set
+    if(field==='fromAmount'||field==='rate'){
+      const fa=parseFloat(mv.fromAmount),r=parseFloat(mv.rate);
+      if(!isNaN(fa)&&!isNaN(r)&&r>0){mv.toAmount=(fa*r).toFixed(4);const ti=document.getElementById(`exto-${id}`);if(ti)ti.value=mv.toAmount;}
+    }
+  }
+  renderMovements();autoSave();
+  const el=document.getElementById('meur-'+id);
+  if(el){
+    if(mv.type==='expense'||mv.type==='advance') el.textContent=mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—';
+  }
 }
+
 async function fetchRate(id){
-  const exp=expenses.find(e=>e.id===id);if(!exp)return;
+  const mv=movements.find(m=>m.id===id);if(!mv)return;
   const btn=document.getElementById('fbtn-'+id);if(btn){btn.disabled=true;btn.textContent='...';}
+  const cur=mv.type==='exchange'?mv.fromCurrency:mv.currency;
+  const toCur=mv.type==='exchange'?mv.toCurrency:'EUR';
   try{
-    const [y,m]=(exp.date||new Date().toISOString().split('T')[0]).split('-');
-    const d=await(await fetch(`https://api.frankfurter.app/${y}-${m}-01?from=${exp.currency}&to=EUR`)).json();
-    if(d.rates?.EUR){exp.rate=d.rates.EUR;exp.amountEur=exp.amount?(parseFloat(exp.amount)*exp.rate).toFixed(2):'';const ri=document.getElementById('ri-'+id);if(ri)ri.value=exp.rate;renderExpenses();autoSave();showToast(`✓ 1 ${exp.currency} = €${exp.rate}`);}
-    else throw new Error('no rate');
+    const [y,m]=(mv.date||today()).split('-');
+    const d=await(await fetch(`https://api.frankfurter.app/${y}-${m}-01?from=${cur}&to=${toCur}`)).json();
+    const rate=d.rates?.[toCur];
+    if(rate){
+      if(mv.type==='exchange'){mv.rate=rate;const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;updField(id,'rate',rate);}
+      else{mv.rate=rate;mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(2):'';const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;}
+      renderMovements();autoSave();showToast(`✓ 1 ${cur} = ${rate} ${toCur}`);
+    } else throw new Error('no rate');
   }catch{
     try{
       const d=await(await fetch('https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN')).json();
-      const entry=d.find(r=>r.isoA3Code===exp.currency);
-      if(entry){exp.rate=1/entry.value;exp.amountEur=exp.amount?(parseFloat(exp.amount)*exp.rate).toFixed(6):'';const ri=document.getElementById('ri-'+id);if(ri)ri.value=exp.rate;renderExpenses();autoSave();showToast(`✓ InforEuro rate applied`);}
-      else showToast('⚠ Rate not found');
+      const entry=d.find(r=>r.isoA3Code===cur);
+      if(entry){
+        const rate=1/entry.value;
+        mv.rate=rate;mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(6):'';
+        const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;
+        renderMovements();autoSave();showToast('✓ InforEuro rate applied');
+      } else showToast('⚠ Rate not found');
     }catch{showToast('⚠ Offline — using default rate');}
   }
   if(btn){btn.disabled=false;btn.textContent='Fetch';}
 }
 
-// ── RENDER LIST ───────────────────────────────────────────────────────────────
-function renderExpenses(){
-  const list=document.getElementById('expensesList');
-  const count=document.getElementById('expensesCount');
-  const bar=document.getElementById('totalBar');
-  const tot=document.getElementById('totalAmount');
-  count.textContent=`Expenses (${expenses.length})`;
-  if(!expenses.length){list.innerHTML=`<div class="empty-state"><div class="ei">🧾</div><p>No expenses yet.<br>Upload receipts or add manually.</p></div>`;bar.style.display='none';return;}
-  let total=0;
-  list.innerHTML=expenses.map((exp,i)=>{
-    const eur=parseFloat(exp.amountEur)||0;total+=eur;
-    const eurStr=eur>0?`€${eur.toFixed(2)}`:'€—';
-    const desc=exp.description||exp.budgetLine||'—';
-    const hasR=exp.receipts&&exp.receipts.length>0;
-    return `<div class="exp-row" onclick="openModal(${exp.id})">
-      <span class="exp-num">#${String(i+1).padStart(2,'0')}</span>
-      <span class="exp-date">${exp.date||'—'}</span>
-      <span class="exp-desc">${desc}</span>
-      ${hasR?'<span class="exp-rcpt">🧾</span>':''}
-      <span class="exp-eur">${eurStr}</span>
-      <span class="exp-arrow">›</span>
-    </div>`;
-  }).join('');
-  tot.textContent=`€${total.toFixed(2)}`;bar.style.display='flex';
+// ── BALANCE CALCULATION ────────────────────────────────────────────────────────
+function calcBalance(){
+  let totalAdvEur=0, totalExpEur=0;
+  // per-currency balances (in original currency)
+  const curBal={};
+
+  for(const mv of movements){
+    if(mv.type==='advance'){
+      const eur=parseFloat(mv.amountEur)||0;
+      totalAdvEur+=eur;
+      const amt=parseFloat(mv.amount)||0;
+      const cur=mv.currency||'EUR';
+      curBal[cur]=(curBal[cur]||0)+amt;
+    }
+    if(mv.type==='expense'){
+      const eur=parseFloat(mv.amountEur)||0;
+      totalExpEur+=eur;
+      const amt=parseFloat(mv.amount)||0;
+      const cur=mv.currency||'EUR';
+      curBal[cur]=(curBal[cur]||0)-amt;
+    }
+    if(mv.type==='exchange'){
+      const fa=parseFloat(mv.fromAmount)||0;
+      const ta=parseFloat(mv.toAmount)||0;
+      const fc=mv.fromCurrency||'EUR';
+      const tc=mv.toCurrency||'EUR';
+      curBal[fc]=(curBal[fc]||0)-fa;
+      curBal[tc]=(curBal[tc]||0)+ta;
+    }
+  }
+  const finalEur=totalAdvEur-totalExpEur;
+  return{totalAdvEur,totalExpEur,finalEur,curBal};
 }
 
-// ── EXPENSE MODAL ─────────────────────────────────────────────────────────────
+// ── RENDER MOVEMENTS ──────────────────────────────────────────────────────────
+function renderMovements(){
+  const list=document.getElementById('expensesList');
+  const count=document.getElementById('expensesCount');
+  const panel=document.getElementById('balancePanel');
+
+  count.textContent=`Movements (${movements.length})`;
+
+  if(!movements.length){
+    list.innerHTML=`<div class="empty-state"><div class="ei">🧾</div><p>No movements yet.<br>Add a cash advance to start.</p></div>`;
+    panel.style.display='none';
+    return;
+  }
+
+  // Update balance panel
+  panel.style.display='block';
+  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
+  document.getElementById('bTotalAdvance').textContent=`€${totalAdvEur.toFixed(2)}`;
+  document.getElementById('bTotalExpense').textContent=`€${totalExpEur.toFixed(2)}`;
+  const bFinal=document.getElementById('bFinal');
+  const bAmt=document.getElementById('bFinalAmount');
+  const bNote=document.getElementById('bFinalNote');
+  bAmt.textContent=`€${Math.abs(finalEur).toFixed(2)}`;
+  if(finalEur>0.005){
+    bFinal.className='balance-final positive';
+    bNote.textContent='Amount to be returned to Administration Office';
+  } else if(finalEur<-0.005){
+    bFinal.className='balance-final negative';
+    bNote.textContent='Advance to be reimbursed to the operator';
+  } else {
+    bFinal.className='balance-final zero';
+    bNote.textContent='Balance settled — no further action required';
+  }
+
+  // Per-currency balances
+  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
+  if(curKeys.length>0){
+    document.getElementById('curBalances').innerHTML=`
+      <div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:.06em;margin-top:10px;margin-bottom:4px">Currency Balances</div>
+      ${curKeys.map(c=>{
+        const v=curBal[c];
+        return`<div class="cur-bal-row"><span class="cname">${c}</span><span class="camount ${v<0?'neg':''}">${v>=0?'+':''}${v.toFixed(4)} ${c}</span></div>`;
+      }).join('')}`;
+  } else document.getElementById('curBalances').innerHTML='';
+
+  // Render rows grouped by type
+  const advances=movements.filter(m=>m.type==='advance');
+  const expenses=movements.filter(m=>m.type==='expense');
+  const exchanges=movements.filter(m=>m.type==='exchange');
+
+  let html='';
+
+  if(advances.length){
+    html+=`<div class="list-divider">💰 Cash Advances</div>`;
+    html+=advances.map(mv=>{
+      const eur=parseFloat(mv.amountEur)||0;
+      return`<div class="exp-row type-advance" onclick="openModal(${mv.id})">
+        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
+        <span class="exp-type-badge badge-advance">ADV</span>
+        <span class="exp-date">${mv.date||'—'}</span>
+        <span class="exp-desc">${mv.description||'Cash advance'}</span>
+        <span class="exp-eur pos">+€${eur.toFixed(2)}</span>
+        <span class="exp-arrow">›</span>
+      </div>`;
+    }).join('');
+  }
+
+  if(exchanges.length){
+    html+=`<div class="list-divider">↔ Currency Exchanges</div>`;
+    html+=exchanges.map(mv=>{
+      return`<div class="exp-row type-exchange" onclick="openModal(${mv.id})">
+        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
+        <span class="exp-type-badge badge-exchange">EXC</span>
+        <span class="exp-date">${mv.date||'—'}</span>
+        <span class="exp-desc">${mv.description||'Currency exchange'}</span>
+        <span class="exp-eur exc">${mv.fromAmount||'?'} ${mv.fromCurrency} → ${mv.toAmount||'?'} ${mv.toCurrency}</span>
+        <span class="exp-arrow">›</span>
+      </div>`;
+    }).join('');
+  }
+
+  if(expenses.length){
+    html+=`<div class="list-divider">🧾 Expenses</div>`;
+    html+=expenses.map(mv=>{
+      const eur=parseFloat(mv.amountEur)||0;
+      const desc=mv.description||mv.budgetLine||'—';
+      const hasR=mv.receipts&&mv.receipts.length>0;
+      return`<div class="exp-row type-expense" onclick="openModal(${mv.id})">
+        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
+        <span class="exp-type-badge badge-expense">EXP</span>
+        <span class="exp-date">${mv.date||'—'}</span>
+        <span class="exp-desc">${desc}</span>
+        ${hasR?'<span class="exp-rcpt">🧾</span>':''}
+        <span class="exp-eur neg">-€${eur.toFixed(2)}</span>
+        <span class="exp-arrow">›</span>
+      </div>`;
+    }).join('');
+  }
+
+  list.innerHTML=html;
+}
+
+// ── MOVEMENT MODAL ────────────────────────────────────────────────────────────
 function openModal(id){renderModal(id);document.getElementById('expModal').classList.add('open');}
 function closeExpModal(){document.getElementById('expModal').classList.remove('open');}
 document.getElementById('expModal').addEventListener('click',function(e){if(e.target===this)closeExpModal();});
 
 function renderModal(id){
-  const exp=expenses.find(e=>e.id===id);if(!exp)return;
-  const idx=expenses.indexOf(exp)+1;
-  document.getElementById('expModalTitle').textContent=`Expense #${String(idx).padStart(2,'0')}`;
-  const rcptsHtml=`<div class="receipts-grid">
-    ${(exp.receipts||[]).map((r,ri)=>`<div class="rcpt-wrap"><img src="${r}" class="rcpt-thumb" onclick="previewImg('${id}',${ri})"><button class="rcpt-del" onclick="removeRcpt(${id},${ri})">✕</button></div>`).join('')}
-    <div class="rcpt-add"><input type="file" accept="image/*,.pdf" onchange="addRcptToExp(${id},this.files)">+</div>
-  </div>`;
-  document.getElementById('expModalBody').innerHTML=`
+  const mv=movements.find(m=>m.id===id);if(!mv)return;
+  const idx=movements.indexOf(mv)+1;
+  const typeLabel=mv.type==='advance'?'💰 Cash Advance':mv.type==='exchange'?'↔ Currency Exchange':'🧾 Expense';
+  document.getElementById('expModalTitle').textContent=`${typeLabel} — #${String(idx).padStart(2,'0')}`;
+
+  let body='';
+
+  if(mv.type==='advance'){
+    body=`
     <div class="form-row c2">
-      <div class="form-group"><label>Date</label><input type="date" value="${exp.date||''}" onchange="updField(${id},'date',this.value)"></div>
-      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===exp.currency?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.currency?'selected':''}>${c}</option>`).join('')}</select></div>
     </div>
     <div class="form-row c2">
-      <div class="form-group"><label>Amount (local)</label><input type="number" step="0.01" value="${exp.amount||''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
-      <div class="form-group"><label>Conversion Rate</label>
-        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${exp.rate||''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
+      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" value="${mv.amount||''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
+      <div class="form-group"><label>Rate to EUR</label>
+        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
         <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
       </div>
     </div>
-    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--accent)" id="meur-${id}">${exp.amountEur?`€${parseFloat(exp.amountEur).toFixed(2)}`:'€—'}</div>
+    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:#1a6e3c" id="meur-${id}">${mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—'}</div>
+    <div class="form-group" style="margin-bottom:14px"><label>Description / Source</label><input type="text" value="${mv.description||''}" placeholder="e.g., Project advance from HQ" onchange="updField(${id},'description',this.value)"></div>`;
+  }
+
+  if(mv.type==='exchange'){
+    body=`
     <div class="form-row c2">
-      <div class="form-group"><label>Budget Line</label><input type="text" value="${exp.budgetLine||''}" placeholder="e.g., Travel" onchange="updField(${id},'budgetLine',this.value)"></div>
-      <div class="form-group"><label>Document Type</label><select onchange="updField(${id},'docType',this.value)">${['Receipt','Invoice','Ticket','Bill','Contract','Other'].map(d=>`<option value="${d}" ${d===exp.docType?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Description</label><input type="text" value="${mv.description||''}" placeholder="e.g., Cash exchange at airport" onchange="updField(${id},'description',this.value)"></div>
     </div>
-    <div class="form-group" style="margin-bottom:14px"><label>Description</label><input type="text" value="${exp.description||''}" placeholder="Brief description" onchange="updField(${id},'description',this.value)"></div>
-    <div class="form-group" style="margin-bottom:14px"><label>Receipts / Documents</label>${rcptsHtml}</div>
-    <button class="btn btn-danger btn-sm" onclick="removeExpense(${id})">🗑 Delete expense</button>`;
+    <div class="form-row c2">
+      <div class="form-group"><label>From Currency</label><select onchange="updField(${id},'fromCurrency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.fromCurrency?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Amount given</label><input type="number" step="0.01" id="exfrom-${id}" value="${mv.fromAmount||''}" placeholder="0.00" onchange="updField(${id},'fromAmount',this.value)"></div>
+    </div>
+    <div class="form-row c2">
+      <div class="form-group"><label>To Currency</label><select onchange="updField(${id},'toCurrency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.toCurrency?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" id="exto-${id}" value="${mv.toAmount||''}" placeholder="0.00" onchange="updField(${id},'toAmount',this.value)"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><label>Exchange Rate (1 From = X To)</label>
+      <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="auto" onchange="updField(${id},'rate',this.value)">
+      <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
+    </div>`;
+  }
+
+  if(mv.type==='expense'){
+    const rcptsHtml=`<div class="receipts-grid">
+      ${(mv.receipts||[]).map((r,ri)=>`<div class="rcpt-wrap"><img src="${r}" class="rcpt-thumb" onclick="previewImg('${id}',${ri})"><button class="rcpt-del" onclick="removeRcpt(${id},${ri})">✕</button></div>`).join('')}
+      <div class="rcpt-add"><input type="file" accept="image/*,.pdf" onchange="addRcptToExp(${id},this.files)">+</div>
+    </div>`;
+    body=`
+    <div class="form-row c2">
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.currency?'selected':''}>${c}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row c2">
+      <div class="form-group"><label>Amount (local)</label><input type="number" step="0.01" value="${mv.amount||''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
+      <div class="form-group"><label>Rate to EUR</label>
+        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
+        <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
+      </div>
+    </div>
+    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--danger)" id="meur-${id}">${mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—'}</div>
+    <div class="form-row c2">
+      <div class="form-group"><label>Budget Line</label><input type="text" value="${mv.budgetLine||''}" placeholder="e.g., Travel" onchange="updField(${id},'budgetLine',this.value)"></div>
+      <div class="form-group"><label>Document Type</label><select onchange="updField(${id},'docType',this.value)">${['Receipt','Invoice','Ticket','Bill','Contract','Other'].map(d=>`<option value="${d}" ${d===mv.docType?'selected':''}>${d}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><label>Description</label><input type="text" value="${mv.description||''}" placeholder="Brief description" onchange="updField(${id},'description',this.value)"></div>
+    <div class="form-group" style="margin-bottom:14px"><label>Receipts / Documents</label>${rcptsHtml}</div>`;
+  }
+
+  body+=`<button class="btn btn-danger btn-sm" onclick="removeMovement(${id})">🗑 Delete movement</button>`;
+  document.getElementById('expModalBody').innerHTML=body;
 }
 
 async function addRcptToExp(id,files){for(const f of Array.from(files)) await processFile(f,id);}
-function removeRcpt(id,ri){const exp=expenses.find(e=>e.id===id);if(!exp)return;exp.receipts.splice(ri,1);renderExpenses();renderModal(id);autoSave();}
-function previewImg(id,ri){const exp=expenses.find(e=>e.id===id);if(!exp||!exp.receipts[ri])return;document.getElementById('imgPrevSrc').src=exp.receipts[ri];document.getElementById('imgPrev').classList.add('open');}
+function removeRcpt(id,ri){const mv=movements.find(m=>m.id===id);if(!mv)return;mv.receipts.splice(ri,1);renderMovements();renderModal(id);autoSave();}
+function previewImg(id,ri){const mv=movements.find(m=>m.id===id);if(!mv||!mv.receipts[ri])return;document.getElementById('imgPrevSrc').src=mv.receipts[ri];document.getElementById('imgPrev').classList.add('open');}
 function closeImgPrev(){document.getElementById('imgPrev').classList.remove('open');}
 
-// ── SIGNATURE — uses Pointer Events (works on all mobile browsers) ────────────
+// ── SIGNATURE ─────────────────────────────────────────────────────────────────
 function initSig(){
   const canvas=document.getElementById('sigCanvas');
   const w=canvas.offsetWidth;
   if(!w||w<20){setTimeout(initSig,100);return;}
-  canvas.width=w; canvas.height=180;
+  canvas.width=w;canvas.height=180;
   const ctx=canvas.getContext('2d');
   ctx.strokeStyle='#1a1a18';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';
   if(signatureData){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,w,180);img.src=signatureData;}
-  if(sigReady) return;
+  if(sigReady)return;
   sigReady=true;
   let drawing=false,lx=0,ly=0;
   function pos(e){const r=canvas.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
-  canvas.addEventListener('pointerdown',e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);drawing=true;[lx,ly]=pos(e);ctx.beginPath();ctx.arc(lx,ly,1.2,0,Math.PI*2);ctx.fillStyle='#1a1a18';ctx.fill();},{passive:false});
+  canvas.addEventListener('pointerdown',e=>{e.preventDefault();try{canvas.setPointerCapture(e.pointerId);}catch(_){}drawing=true;[lx,ly]=pos(e);ctx.beginPath();ctx.arc(lx,ly,1.2,0,Math.PI*2);ctx.fillStyle='#1a1a18';ctx.fill();},{passive:false});
   canvas.addEventListener('pointermove',e=>{e.preventDefault();if(!drawing)return;const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();lx=x;ly=y;},{passive:false});
   canvas.addEventListener('pointerup',()=>drawing=false);
   canvas.addEventListener('pointerleave',()=>drawing=false);
@@ -552,7 +817,7 @@ function saveSig(){signatureData=document.getElementById('sigCanvas').toDataURL(
 
 // ── EXPORT PDF ────────────────────────────────────────────────────────────────
 async function exportPDF(){
-  if(!expenses.length){showToast('⚠ No expenses to export');return;}
+  if(!movements.length){showToast('⚠ No movements to export');return;}
   if(!signatureData&&!confirm('No signature saved. Export anyway?'))return;
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -560,19 +825,84 @@ async function exportPDF(){
   const g=id=>document.getElementById(id).value||'';
   const rn=g('reportName')||'Expense Report',pn=g('personName'),proj=g('projectName'),pid=g('projectId'),sd=g('startDate'),ed=g('endDate');
   const countries=missionCountries.filter(Boolean).join(', ');
+
   doc.setFillColor(26,31,46);doc.rect(0,0,PW,36,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(rn,M,13);
   doc.setFontSize(8);doc.setFont('helvetica','normal');
   const meta=[pn&&`By: ${pn}`,proj&&`Project: ${proj}`,pid&&`ID: ${pid}`,countries&&`Countries: ${countries}`,(sd||ed)&&`Period: ${sd} – ${ed}`].filter(Boolean).join('   ');
   doc.text(meta,M,22);doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`,M,29);
   doc.setTextColor(0,0,0);
-  const totalEur=expenses.reduce((s,e)=>s+(parseFloat(e.amountEur)||0),0);
-  const rows=expenses.map((e,i)=>[String(i+1),e.date||'',e.amount?String(e.amount):'',e.currency||'',e.rate?parseFloat(e.rate).toFixed(4):'',e.amountEur?`€${parseFloat(e.amountEur).toFixed(2)}`:'',(e.budgetLine||''),(e.docType||''),(e.description||'')]);
-  rows.push(['','','','','TOTAL',`€${totalEur.toFixed(2)}`,'','','']);
-  doc.autoTable({startY:42,head:[['#','Date','Amount','Cur.','Rate','EUR','Budget','Doc','Description']],body:rows,styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[45,90,61],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,246,242]},columnStyles:{8:{cellWidth:32}},margin:{left:M,right:M}});
-  let y=doc.lastAutoTable.finalY+10;
-  if(signatureData){if(y>255){doc.addPage();y=14;}doc.setFontSize(8);doc.setTextColor(120,120,120);doc.text('Signature:',M,y);y+=3;doc.addImage(signatureData,'PNG',M,y,55,18);y+=20;doc.setFontSize(9);doc.setTextColor(0,0,0);doc.text(pn||'Reporting Person',M,y);y+=8;}
-  const imgs=expenses.flatMap((exp,i)=>(exp.receipts||[]).map(r=>({r,label:`#${i+1} — ${exp.date||''} — ${exp.description||''}`}))).filter(x=>!x.r.startsWith('data:application/pdf'));
+
+  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
+
+  // Advances table
+  const advances=movements.filter(m=>m.type==='advance');
+  if(advances.length){
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Cash Advances',M,44);
+    doc.autoTable({startY:47,head:[['#','Date','Amount','Currency','Rate','EUR','Description']],
+      body:advances.map((m,i)=>[i+1,m.date||'',m.amount||'',m.currency||'',m.rate?parseFloat(m.rate).toFixed(4):'',m.amountEur?`€${parseFloat(m.amountEur).toFixed(2)}`:'',(m.description||'')]),
+      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[20,100,60],textColor:255,fontStyle:'bold'},
+      margin:{left:M,right:M}});
+  }
+
+  // Exchanges table
+  const exchanges=movements.filter(m=>m.type==='exchange');
+  let yAfterAdv=advances.length?doc.lastAutoTable.finalY+6:44;
+  if(exchanges.length){
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Currency Exchanges',M,yAfterAdv+6);
+    doc.autoTable({startY:yAfterAdv+9,head:[['#','Date','From Amt','From Cur','To Amt','To Cur','Rate','Description']],
+      body:exchanges.map((m,i)=>[i+1,m.date||'',m.fromAmount||'',m.fromCurrency||'',m.toAmount||'',m.toCurrency||'',m.rate?parseFloat(m.rate).toFixed(4):(m.description||'')]),
+      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[29,78,216],textColor:255,fontStyle:'bold'},
+      margin:{left:M,right:M}});
+  }
+
+  // Expenses table
+  const expenses=movements.filter(m=>m.type==='expense');
+  let yAfterExc=(exchanges.length||(advances.length&&!exchanges.length))?doc.lastAutoTable.finalY+6:44;
+  if(expenses.length){
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Expenses',M,yAfterExc+6);
+    const expRows=expenses.map((m,i)=>[i+1,m.date||'',m.amount||'',m.currency||'',m.rate?parseFloat(m.rate).toFixed(4):'',m.amountEur?`€${parseFloat(m.amountEur).toFixed(2)}`:'',(m.budgetLine||''),(m.docType||''),(m.description||'')]);
+    expRows.push(['','','','','TOTAL',`€${totalExpEur.toFixed(2)}`,'','','']);
+    doc.autoTable({startY:yAfterExc+9,head:[['#','Date','Amount','Cur.','Rate','EUR','Budget','Doc','Description']],body:expRows,
+      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[45,90,61],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,246,242]},
+      columnStyles:{8:{cellWidth:32}},margin:{left:M,right:M}});
+  }
+
+  let y=doc.lastAutoTable?doc.lastAutoTable.finalY+10:60;
+
+  // BALANCE SUMMARY BOX
+  if(y>240){doc.addPage();y=14;}
+  doc.setFillColor(26,31,46);doc.rect(M,y,CW,28,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
+  doc.text('FINANCIAL SUMMARY',M+4,y+6);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);
+  doc.text(`Total Advances: €${totalAdvEur.toFixed(2)}   Total Expenses: €${totalExpEur.toFixed(2)}`,M+4,y+13);
+  const balNote=finalEur>0.005?`BALANCE: €${finalEur.toFixed(2)} — Amount to be returned to Administration Office`:
+    finalEur<-0.005?`BALANCE: €${Math.abs(finalEur).toFixed(2)} — Advance to be reimbursed to the operator`:
+    'BALANCE: €0.00 — Settled';
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(balNote,M+4,y+22);
+  doc.setTextColor(0,0,0);y+=34;
+
+  // Currency balances
+  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
+  if(curKeys.length){
+    if(y>255){doc.addPage();y=14;}
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('Currency Balances:',M,y);y+=5;
+    doc.setFont('helvetica','normal');
+    curKeys.forEach(c=>{doc.text(`  ${c}: ${curBal[c]>=0?'+':''}${curBal[c].toFixed(4)}`,M,y);y+=4;});
+    y+=4;
+  }
+
+  // Signature
+  if(signatureData){
+    if(y>255){doc.addPage();y=14;}
+    doc.setFontSize(8);doc.setTextColor(120,120,120);doc.text('Signature:',M,y);y+=3;
+    doc.addImage(signatureData,'PNG',M,y,55,18);y+=20;
+    doc.setFontSize(9);doc.setTextColor(0,0,0);doc.text(pn||'Reporting Person',M,y);y+=8;
+  }
+
+  // Receipt images
+  const imgs=expenses.flatMap((mv,i)=>(mv.receipts||[]).map(r=>({r,label:`Exp #${movements.indexOf(mv)+1} — ${mv.date||''} — ${mv.description||''}`}))).filter(x=>!x.r.startsWith('data:application/pdf'));
   if(imgs.length){
     if(y>240){doc.addPage();y=14;}
     doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Attached Documents',M,y);y+=7;doc.setFont('helvetica','normal');
@@ -587,32 +917,143 @@ async function exportPDF(){
       y+=dh+8;doc.setTextColor(0,0,0);
     }
   }
+
   doc.save(`${rn.replace(/\s+/g,'_')}_expense_report.pdf`);showToast('✓ PDF exported');
 }
 function imgDims(src){return new Promise(res=>{const i=new Image();i.onload=()=>res({w:i.naturalWidth,h:i.naturalHeight});i.onerror=()=>res({w:1,h:1});i.src=src;});}
 
-// ── EXPORT ODF/CSV ────────────────────────────────────────────────────────────
-function exportODF(){
-  if(!expenses.length){showToast('⚠ No expenses to export');return;}
+// ── EXPORT ODS ────────────────────────────────────────────────────────────────
+async function exportODS(){
+  if(!movements.length){showToast('⚠ No movements to export');return;}
   const g=id=>document.getElementById(id).value||'';
   const rn=g('reportName')||'Expense Report';
-  const lines=[['EXPENSE REPORT'],['Report Name:',rn],['Person:',g('personName')],['Project:',g('projectName')],['ID:',g('projectId')],['Countries:',missionCountries.filter(Boolean).join(', ')],['Period:',`${g('startDate')} – ${g('endDate')}`],['Generated:',new Date().toLocaleDateString('en-GB')],[],['#','Date','Amount','Currency','Rate','EUR','Budget','Doc','Description']];
-  let tot=0;
-  expenses.forEach((e,i)=>{const eur=parseFloat(e.amountEur)||0;tot+=eur;lines.push([i+1,e.date||'',e.amount||'',e.currency||'',e.rate||'',eur.toFixed(2),e.budgetLine||'',e.docType||'',e.description||'']);});
-  lines.push([],[,'','','','TOTAL (EUR)',tot.toFixed(2)]);
-  const csv=lines.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'})),download:`${rn.replace(/\s+/g,'_')}_expense_report.csv`});
-  a.click();URL.revokeObjectURL(a.href);showToast('✓ CSV exported');
+  const pn=g('personName'),proj=g('projectName'),pid=g('projectId'),sd=g('startDate'),ed=g('endDate');
+  const countries=missionCountries.filter(Boolean).join(', ');
+  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
+
+  // Helper: escape XML
+  const xe=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // Build rows as arrays of cell values
+  const rows=[];
+  const hdr=(v)=>`<table:table-cell table:style-name="ce-header"><text:p>${xe(v)}</text:p></table:table-cell>`;
+  const cell=(v)=>`<table:table-cell office:value-type="string"><text:p>${xe(v)}</text:p></table:table-cell>`;
+  const num=(v)=>{const n=parseFloat(v);return isNaN(n)?`<table:table-cell office:value-type="string"><text:p></text:p></table:table-cell>`:`<table:table-cell office:value-type="float" office:value="${n}"><text:p>${n}</text:p></table:table-cell>`;};
+
+  function row(cells){return`<table:table-row>${cells.join('')}</table:table-row>`;}
+  function emptyRow(){return`<table:table-row><table:table-cell/></table:table-row>`;}
+
+  let tableRows='';
+
+  // Header info
+  tableRows+=row([hdr('EXPENSE REPORT')]);
+  tableRows+=row([cell('Report Name:'),cell(rn)]);
+  tableRows+=row([cell('Person Reporting:'),cell(pn)]);
+  tableRows+=row([cell('Project:'),cell(proj)]);
+  tableRows+=row([cell('Project ID:'),cell(pid)]);
+  tableRows+=row([cell('Countries:'),cell(countries)]);
+  tableRows+=row([cell('Period:'),cell(`${sd} – ${ed}`)]);
+  tableRows+=row([cell('Generated:'),cell(new Date().toLocaleDateString('en-GB'))]);
+  tableRows+=emptyRow();
+
+  // Advances
+  const advances=movements.filter(m=>m.type==='advance');
+  if(advances.length){
+    tableRows+=row([hdr('CASH ADVANCES')]);
+    tableRows+=row(['#','Date','Amount','Currency','Rate','EUR','Description'].map(hdr));
+    advances.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.amount),cell(m.currency||''),num(m.rate),num(m.amountEur),cell(m.description||'')]);});
+    tableRows+=emptyRow();
+  }
+
+  // Exchanges
+  const exchanges=movements.filter(m=>m.type==='exchange');
+  if(exchanges.length){
+    tableRows+=row([hdr('CURRENCY EXCHANGES')]);
+    tableRows+=row(['#','Date','From Amount','From Currency','To Amount','To Currency','Rate','Description'].map(hdr));
+    exchanges.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.fromAmount),cell(m.fromCurrency||''),num(m.toAmount),cell(m.toCurrency||''),num(m.rate),cell(m.description||'')]);});
+    tableRows+=emptyRow();
+  }
+
+  // Expenses
+  const expenses=movements.filter(m=>m.type==='expense');
+  if(expenses.length){
+    tableRows+=row([hdr('EXPENSES')]);
+    tableRows+=row(['#','Date','Amount','Currency','Rate','EUR','Budget Line','Doc Type','Description'].map(hdr));
+    expenses.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.amount),cell(m.currency||''),num(m.rate),num(m.amountEur),cell(m.budgetLine||''),cell(m.docType||''),cell(m.description||'')]);});
+    tableRows+=row([cell(''),cell(''),cell(''),cell(''),hdr('TOTAL'),num(totalExpEur),cell(''),cell(''),cell('')]);
+    tableRows+=emptyRow();
+  }
+
+  // Balance summary
+  tableRows+=row([hdr('FINANCIAL SUMMARY')]);
+  tableRows+=row([cell('Total Advances (EUR):'),num(totalAdvEur)]);
+  tableRows+=row([cell('Total Expenses (EUR):'),num(totalExpEur)]);
+  tableRows+=row([hdr('Final Balance (EUR):'),num(finalEur)]);
+  const note=finalEur>0.005?'Amount to be returned to Administration Office':finalEur<-0.005?'Advance to be reimbursed to the operator':'Balance settled';
+  tableRows+=row([cell('Note:'),cell(note)]);
+  tableRows+=emptyRow();
+
+  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
+  if(curKeys.length){
+    tableRows+=row([hdr('CURRENCY BALANCES')]);
+    tableRows+=row([hdr('Currency'),hdr('Balance')]);
+    curKeys.forEach(c=>{tableRows+=row([cell(c),num(curBal[c])]);});
+  }
+
+  const content=`<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  xmlns:office_value="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+  office:version="1.3">
+<office:automatic-styles>
+  <style:style style:name="ce-header" style:family="table-cell">
+    <style:text-properties fo:font-weight="bold"/>
+  </style:style>
+</office:automatic-styles>
+<office:body><office:spreadsheet>
+<table:table table:name="Expense Report">
+${tableRows}
+</table:table>
+</office:spreadsheet></office:body></office:document-content>`;
+
+  const manifest=`<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3">
+  <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>
+  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
+</manifest:manifest>`;
+
+  const meta=`<?xml version="1.0" encoding="UTF-8"?>
+<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.3">
+<office:meta><dc:title>${xe(rn)}</dc:title></office:meta></office:document-meta>`;
+
+  const mimetype='application/vnd.oasis.opendocument.spreadsheet';
+
+  const zip=new JSZip();
+  zip.file('mimetype',mimetype,{compression:'STORE'});
+  zip.folder('META-INF').file('manifest.xml',manifest);
+  zip.file('content.xml',content);
+  zip.file('meta.xml',meta);
+
+  const blob=await zip.generateAsync({type:'blob',mimeType:mimetype,compression:'DEFLATE',compressionOptions:{level:6}});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`${rn.replace(/\s+/g,'_')}_expense_report.ods`});
+  a.click();URL.revokeObjectURL(a.href);
+  showToast('✓ ODS exported');
 }
 
 // ── NEW REPORT ────────────────────────────────────────────────────────────────
 function newReport(){
-  if(expenses.length&&!confirm('Start a new report? Current data will be cleared.'))return;
-  expenses=[];signatureData=null;missionCountries=['','',''];sigReady=false;
+  if(movements.length&&!confirm('Start a new report? Current data will be cleared.'))return;
+  movements=[];signatureData=null;missionCountries=['','',''];sigReady=false;
   ['reportName','startDate','endDate','personName','projectName','projectId'].forEach(id=>document.getElementById(id).value='');
   for(let i=0;i<3;i++){document.getElementById('country'+i).value='';document.getElementById('ctag'+i).style.display='none';}
   document.getElementById('sigStatus').textContent='Not signed';
-  renderExpenses();autoSave();showToast('New report started');
+  renderMovements();autoSave();showToast('New report started');
 }
 
 // ── PERSIST ───────────────────────────────────────────────────────────────────
@@ -621,7 +1062,7 @@ function autoSave(){
     reportName:document.getElementById('reportName').value,startDate:document.getElementById('startDate').value,
     endDate:document.getElementById('endDate').value,personName:document.getElementById('personName').value,
     projectName:document.getElementById('projectName').value,projectId:document.getElementById('projectId').value,
-    expenses,signatureData,missionCountries
+    movements,signatureData,missionCountries
   }));}catch(e){}
 }
 function loadState(){
@@ -630,13 +1071,18 @@ function loadState(){
     const raw=localStorage.getItem('expenseReportState');if(!raw)return;
     const s=JSON.parse(raw);
     ['reportName','startDate','endDate','personName','projectName','projectId'].forEach(id=>{if(s[id]!==undefined)document.getElementById(id).value=s[id];});
-    expenses=s.expenses||[];
-    expenses.forEach(e=>{if(!e.receipts){e.receipts=e.receipt?[e.receipt]:[];delete e.receipt;}});
+    // migrate old format
+    if(s.expenses&&!s.movements){
+      movements=s.expenses.map(e=>{if(!e.receipts){e.receipts=e.receipt?[e.receipt]:[];delete e.receipt;}e.type=e.type||'expense';return e;});
+    } else {
+      movements=s.movements||[];
+      movements.forEach(m=>{if(!m.receipts)m.receipts=[];});
+    }
     signatureData=s.signatureData||null;
     if(signatureData)document.getElementById('sigStatus').textContent='✓ Signature saved';
     missionCountries=s.missionCountries||['','',''];
     missionCountries.forEach((n,i)=>{if(n){document.getElementById('country'+i).value=n;updateCountry(i,n);}});
-    renderExpenses();
+    renderMovements();
   }catch(e){console.warn(e);}
 }
 
