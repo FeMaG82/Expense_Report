@@ -12,7 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<!-- JSZip for ODS generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
@@ -28,18 +27,14 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.5}
-
 .app-header{background:var(--ink);color:#fff;padding:0 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 2px 16px rgba(0,0,0,.2)}
 .app-header h1{font-family:'DM Serif Display',serif;font-size:1.1rem}
 .header-actions{display:flex;gap:8px;align-items:center}
 .btn-icon{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;white-space:nowrap}
 .btn-icon:hover{background:rgba(255,255,255,.22)}
-
-.main{max-width:700px;margin:0 auto;padding:16px 14px 82px}
-
+.main{max-width:720px;margin:0 auto;padding:16px 14px 82px}
 .card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
 .card-title{font-family:'DM Serif Display',serif;font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-
 .form-row{display:grid;gap:10px;margin-bottom:10px}
 .form-row.c2{grid-template-columns:1fr 1fr}
 .form-row.c3{grid-template-columns:1fr 1fr 1fr}
@@ -48,32 +43,24 @@ label{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;
 input,select,textarea{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--surface2);transition:border-color .2s;width:100%}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);background:#fff}
 input::placeholder{color:var(--ink3)}
-
 .btn{border:none;border-radius:var(--radius-sm);padding:10px 16px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:#333}
 .btn-success{background:var(--accent);color:#fff}.btn-success:hover{background:var(--accent2)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--ink2)}.btn-outline:hover{border-color:var(--ink2);color:var(--ink)}
 .btn-danger{background:var(--danger-light);color:var(--danger);border:1px solid #f5c6c2}.btn-danger:hover{background:var(--danger);color:#fff}
-.btn-warn{background:var(--warn-light);color:var(--warn);border:1px solid #f5d9a0}.btn-warn:hover{background:var(--warn);color:#fff}
 .btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid #bfd7ff}.btn-blue:hover{background:var(--blue);color:#fff}
 .btn-sm{padding:6px 10px;font-size:12px}
-.btn-full{width:100%;justify-content:center}
-
-/* API BANNER */
 .api-banner{background:#fff8e6;border:1.5px solid #f0c060;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:12px}
 .api-banner p{font-size:13px;color:#7a5a00;margin-bottom:8px}
 .api-banner a{color:var(--accent);font-weight:600}
 .api-key-row{display:flex;gap:8px}
 .api-key-row input{flex:1;font-family:monospace;font-size:13px}
-
-/* UPLOAD */
 .upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);position:relative}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--accent-light)}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .upload-icon{width:44px;height:44px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto 10px}
 .upload-zone p{color:var(--ink2);font-size:14px}
 .upload-zone small{color:var(--ink3);font-size:12px}
-
 .ocr-status{margin-top:10px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;display:none}
 .ocr-status.processing{background:#e8f0ff;color:#1d4ed8;display:flex;align-items:center;gap:8px}
 .ocr-status.success{background:var(--accent-light);color:var(--accent);display:flex;align-items:center;gap:8px}
@@ -84,53 +71,60 @@ input::placeholder{color:var(--ink3)}
 /* BALANCE PANEL */
 .balance-panel{background:var(--ink);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px}
 .balance-panel h3{font-family:'DM Serif Display',serif;font-size:1rem;margin-bottom:12px;opacity:.8}
-.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .balance-item{background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px}
-.balance-item.full{grid-column:1/-1}
-.balance-item label{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px}
-.balance-item .val{font-family:'DM Serif Display',serif;font-size:1.15rem}
-.balance-final{border-radius:8px;padding:12px 14px;margin-top:4px}
+.balance-item label{font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px;color:#fff}
+.balance-item .val{font-family:'DM Serif Display',serif;font-size:1.1rem}
+.balance-final{border-radius:8px;padding:12px 14px;margin-bottom:10px}
 .balance-final.positive{background:#1a5c30}
 .balance-final.negative{background:#7a1a1a}
 .balance-final.zero{background:rgba(255,255,255,.1)}
-.balance-final .bf-amount{font-family:'DM Serif Display',serif;font-size:1.3rem;margin-bottom:2px}
-.balance-final .bf-note{font-size:12px;opacity:.8;font-style:italic}
-
-/* CURRENCY BALANCES */
-.cur-balances{margin-top:10px}
-.cur-bal-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.cur-bal-row:last-child{border-bottom:none}
-.cur-bal-row .cname{opacity:.7}
-.cur-bal-row .camount{font-weight:600}
-.cur-bal-row .camount.neg{color:#ff9999}
+.balance-final .bf-amount{font-family:'DM Serif Display',serif;font-size:1.25rem;margin-bottom:2px}
+.balance-final .bf-note{font-size:12px;opacity:.85;font-style:italic}
+.cur-section{margin-top:8px}
+.cur-section-title{font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.cur-tranche-group{background:rgba(255,255,255,.06);border-radius:6px;padding:8px 10px;margin-bottom:6px}
+.cur-tranche-group .ctg-header{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px}
+.tranche-row{display:flex;justify-content:space-between;font-size:11px;opacity:.75;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.tranche-row:last-child{border-bottom:none}
+.tranche-row .tr-rate{opacity:.6;font-size:10px}
+.tranche-row .tr-bal{font-weight:600}
+.tranche-row .tr-bal.depleted{opacity:.4;text-decoration:line-through}
 
 /* MOVEMENT ROWS */
 .expenses-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
 .expenses-count{font-family:'DM Serif Display',serif;font-size:1.05rem}
 .add-btns{display:flex;gap:6px;flex-wrap:wrap}
-
-.exp-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:7px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.exp-row{display:flex;align-items:center;gap:6px;padding:9px 11px;border-radius:var(--radius-sm);border:1.5px solid var(--border);margin-bottom:7px;background:var(--surface2);cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
 .exp-row:hover,.exp-row:active{border-color:var(--accent);background:var(--accent-light)}
 .exp-row.type-advance{border-left:3px solid #1d9e5c}
 .exp-row.type-exchange{border-left:3px solid #1d4ed8}
 .exp-row.type-expense{border-left:3px solid var(--border)}
-.exp-num{font-size:11px;font-weight:700;color:var(--ink3);min-width:26px}
-.exp-type-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.exp-row.type-expense.free{border-left:3px solid var(--warn)}
+.exp-num{font-size:10px;font-weight:700;color:var(--ink3);min-width:22px;flex-shrink:0}
+.exp-type-badge{font-size:10px;font-weight:700;border-radius:4px;padding:2px 5px;white-space:nowrap;flex-shrink:0}
 .badge-expense{background:#f0f0ea;color:var(--ink2)}
 .badge-advance{background:#d4f5e4;color:#1a6e3c}
 .badge-exchange{background:#dbeafe;color:#1d4ed8}
-.exp-date{font-size:12px;color:var(--ink2);min-width:78px;flex-shrink:0}
-.exp-desc{flex:1;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.exp-rcpt{font-size:13px;flex-shrink:0}
-.exp-eur{font-family:'DM Serif Display',serif;font-size:.95rem;min-width:70px;text-align:right;flex-shrink:0}
+.badge-free{background:var(--warn-light);color:var(--warn)}
+.exp-date{font-size:11px;color:var(--ink2);min-width:74px;flex-shrink:0}
+.exp-desc{flex:1;font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-rate{font-size:11px;color:var(--ink3);min-width:56px;text-align:center;flex-shrink:0;font-family:monospace}
+.exp-rcpt{font-size:12px;flex-shrink:0}
+.exp-eur{font-family:'DM Serif Display',serif;font-size:.9rem;min-width:62px;text-align:right;flex-shrink:0}
 .exp-eur.pos{color:#1a6e3c}
 .exp-eur.neg{color:var(--danger)}
 .exp-eur.exc{color:var(--blue)}
-.exp-arrow{color:var(--ink3);font-size:14px;flex-shrink:0}
+.exp-arrow{color:var(--ink3);font-size:12px;flex-shrink:0}
+
+/* Multi-tranche subtotals in list */
+.exp-multitranche{background:rgba(212,134,10,.08);border:1px solid rgba(212,134,10,.25);border-radius:6px;padding:5px 8px;margin-top:4px;font-size:11px;color:var(--warn)}
+.exp-multitranche .mt-row{display:flex;justify-content:space-between;padding:1px 0}
 
 .empty-state{text-align:center;padding:36px 20px;color:var(--ink3)}
 .empty-state .ei{font-size:2.2rem;margin-bottom:10px}
 .empty-state p{font-size:14px}
+.list-divider{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:8px 4px 4px;margin-bottom:2px}
 
 /* SIGNATURE */
 .sig-wrapper{border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;margin-bottom:10px}
@@ -141,11 +135,10 @@ input::placeholder{color:var(--ink3)}
 /* MODALS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:var(--radius);max-width:560px;width:100%;padding:20px;box-shadow:var(--shadow-lg);position:relative;margin:auto}
+.modal{background:var(--surface);border-radius:var(--radius);max-width:580px;width:100%;padding:20px;box-shadow:var(--shadow-lg);position:relative;margin:auto}
 .modal-title{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:14px;padding-right:36px}
 .modal-close{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);color:var(--ink2);border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--danger-light);color:var(--danger)}
-
 .receipts-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .rcpt-wrap{position:relative}
 .rcpt-thumb{width:70px;height:70px;border-radius:8px;object-fit:cover;border:1.5px solid var(--border);cursor:pointer;display:block}
@@ -153,12 +146,18 @@ input::placeholder{color:var(--ink3)}
 .rcpt-add{width:70px;height:70px;border-radius:8px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ink3);cursor:pointer;background:var(--surface2);position:relative}
 .rcpt-add input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .rcpt-add:hover{border-color:var(--accent);color:var(--accent)}
-
 .rate-row{display:flex;gap:6px;align-items:center}
 .rate-row input{flex:1}
 .btn-fetch{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:9px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:background .2s}
 .btn-fetch:hover{background:var(--accent2)}
 .btn-fetch:disabled{background:var(--ink3);cursor:not-allowed}
+.fifo-info{background:var(--warn-light);border:1px solid rgba(212,134,10,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--warn);margin-bottom:10px}
+.fifo-info strong{display:block;margin-bottom:3px}
+.fifo-row{display:flex;justify-content:space-between;padding:2px 0;font-size:11px}
+.payment-pills{display:flex;gap:6px;flex-wrap:wrap}
+.payment-pill{border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;background:var(--surface2);color:var(--ink2);transition:all .2s}
+.payment-pill.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.payment-pill.active.free{border-color:var(--warn);background:var(--warn-light);color:var(--warn)}
 
 /* COUNTRIES */
 .countries-row{display:flex;flex-direction:column;gap:8px}
@@ -169,28 +168,20 @@ input::placeholder{color:var(--ink3)}
 /* ACTION BAR */
 .action-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:90}
 .action-bar .btn{flex:1;justify-content:center}
-
 .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .tag-online{background:#dff5e7;color:#1a7a40}
 .tag-offline{background:#fef3cd;color:#856404}
-
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 .section-nav{display:flex;gap:3px;margin-bottom:16px;background:var(--surface);padding:4px;border-radius:var(--radius);border:1px solid var(--border)}
 .section-tab{flex:1;text-align:center;padding:8px 4px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink3);transition:all .2s;border:none;background:transparent;font-family:'DM Sans',sans-serif}
 .section-tab.active{background:var(--ink);color:#fff}
 .section{display:none}
 .section.active{display:block}
-
 .img-prev-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px}
 .img-prev-overlay.open{display:flex}
 .img-prev-overlay img{max-width:100%;max-height:90vh;border-radius:8px;object-fit:contain}
 .img-prev-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.18);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-/* DIVIDER */
-.list-divider{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:8px 4px 4px;margin-bottom:2px}
-
 @media(max-width:560px){.form-row.c2,.form-row.c3{grid-template-columns:1fr}.add-btns .btn-sm{font-size:11px;padding:5px 8px}}
 </style>
 </head>
@@ -270,24 +261,17 @@ input::placeholder{color:var(--ink3)}
 
   <!-- MOVEMENTS -->
   <div class="section" id="section-expenses">
-    <!-- BALANCE PANEL -->
     <div class="balance-panel" id="balancePanel" style="display:none">
       <h3>📊 Balance Summary</h3>
       <div class="balance-grid">
-        <div class="balance-item">
-          <label>Total Advances (EUR)</label>
-          <div class="val" id="bTotalAdvance">€0.00</div>
-        </div>
-        <div class="balance-item">
-          <label>Total Expenses (EUR)</label>
-          <div class="val" id="bTotalExpense">€0.00</div>
-        </div>
+        <div class="balance-item"><label>Total Advances (EUR)</label><div class="val" id="bTotalAdvance">€0.00</div></div>
+        <div class="balance-item"><label>Total Expenses (EUR)</label><div class="val" id="bTotalExpense">€0.00</div></div>
       </div>
       <div class="balance-final" id="bFinal">
         <div class="bf-amount" id="bFinalAmount">€0.00</div>
         <div class="bf-note" id="bFinalNote"></div>
       </div>
-      <div class="cur-balances" id="curBalances"></div>
+      <div class="cur-section" id="curSection"></div>
     </div>
 
     <div class="card">
@@ -325,7 +309,6 @@ input::placeholder{color:var(--ink3)}
   <button class="btn btn-primary" onclick="exportODS()">📊 Export ODS</button>
 </div>
 
-<!-- MOVEMENT DETAIL MODAL -->
 <div class="modal-overlay" id="expModal">
   <div class="modal">
     <button class="modal-close" onclick="closeExpModal()">✕</button>
@@ -334,7 +317,6 @@ input::placeholder{color:var(--ink3)}
   </div>
 </div>
 
-<!-- IMAGE PREVIEW -->
 <div class="img-prev-overlay" id="imgPrev" onclick="closeImgPrev()">
   <button class="img-prev-close" onclick="closeImgPrev()">✕</button>
   <img id="imgPrevSrc" src="" alt="">
@@ -344,7 +326,9 @@ input::placeholder{color:var(--ink3)}
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
-// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════════════════════════════
 const COUNTRY_LIST=[
   {name:'Albania',currency:'ALL',flag:'🇦🇱'},
   {name:'Italy',currency:'EUR',flag:'🇮🇹'},
@@ -358,738 +342,957 @@ const COUNTRY_LIST=[
 ];
 const CURRENCIES=['EUR','USD','GBP','CHF','JPY','SEK','NOK','DKK','PLN','CZK','HUF','RON','BGN','MKD','ALL','MZN','KES','ZMW','ZAR','TZS','UGX','RWF','ETB','GHS','NGN','MAD','TND'];
 const DEFAULT_RATES={EUR:1,USD:0.92,GBP:1.17,CHF:1.04,JPY:0.0062,SEK:0.088,NOK:0.086,DKK:0.134,PLN:0.23,CZK:0.041,HUF:0.0026,RON:0.20,BGN:0.51,MKD:0.016,ALL:0.0095,MZN:0.014,KES:0.0071,ZMW:0.037,ZAR:0.051,TZS:0.00036,UGX:0.00025,RWF:0.00071,ETB:0.0065,GHS:0.061,NGN:0.00058,MAD:0.092,TND:0.296};
+const PAY_METHODS=['Cash','Personal Card','Institutional Card'];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-// movement types: 'expense' | 'advance' | 'exchange'
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+// Each movement: { id, type:'expense'|'advance'|'exchange', date, ... }
+// expense extra fields: amount, currency, rate, rateOverride:bool, paymentMethod,
+//   amountEur, budgetLine, description, docType, receipts[]
+//   computed: fifoSlices:[{trancheId, amount, rate, eur}], totalEur
+// advance: amount, currency, rate, amountEur, description, receipts[]
+// exchange: fromCurrency, fromAmount, toCurrency, toAmount, rate, description, receipts[]
 let movements=[], signatureData=null, ocrApiKey='', isOnline=navigator.onLine, missionCountries=['','',''], sigReady=false;
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('load',()=>{
+// ══════════════════════════════════════════════════════════════════════════════
+// FIFO ENGINE
+// ══════════════════════════════════════════════════════════════════════════════
+// Returns a snapshot of FIFO state after processing all movements in order.
+// fifoState[currency] = array of tranche objects (mutable copies), sorted oldest-first.
+// Each tranche: { id (source movement id + trancheIdx), sourceId, rate, remaining }
+
+function buildFifoState(upToIndex = Infinity) {
+  // tranche queues per currency
+  const queues = {}; // currency -> [{id, sourceId, rate, remaining}]
+
+  for (let i = 0; i < movements.length && i <= upToIndex; i++) {
+    const mv = movements[i];
+
+    if (mv.type === 'advance') {
+      const cur = mv.currency || 'EUR';
+      const amt = parseFloat(mv.amount) || 0;
+      const rate = parseFloat(mv.rate) || 1;
+      if (amt > 0) {
+        if (!queues[cur]) queues[cur] = [];
+        queues[cur].push({ id: mv.id + '_adv', sourceId: mv.id, rate, remaining: amt });
+      }
+    }
+
+    if (mv.type === 'exchange') {
+      const fc = mv.fromCurrency, tc = mv.toCurrency;
+      const fa = parseFloat(mv.fromAmount) || 0;
+      const ta = parseFloat(mv.toAmount) || 0;
+      const rate = parseFloat(mv.rate) || 1;
+      // Deduct from source currency FIFO
+      if (fa > 0 && queues[fc]) consumeFifo(queues[fc], fa);
+      // Add to target currency FIFO
+      if (ta > 0) {
+        if (!queues[tc]) queues[tc] = [];
+        queues[tc].push({ id: mv.id + '_exc', sourceId: mv.id, rate, remaining: ta });
+      }
+    }
+
+    if (mv.type === 'expense' && !mv.rateOverride && mv.paymentMethod === 'Cash') {
+      const cur = mv.currency || 'EUR';
+      const amt = parseFloat(mv.amount) || 0;
+      if (amt > 0 && queues[cur]) consumeFifo(queues[cur], amt);
+    }
+  }
+
+  return queues;
+}
+
+function consumeFifo(queue, amount) {
+  let remaining = amount;
+  for (const t of queue) {
+    if (remaining <= 0) break;
+    const consume = Math.min(t.remaining, remaining);
+    t.remaining -= consume;
+    remaining -= consume;
+  }
+  // Remove fully depleted tranches
+  // (keep them for display, just leave remaining=0)
+}
+
+// Get FIFO slices for a specific cash expense (how it maps to tranches)
+// Returns: { slices:[{rate, amount, eur}], totalEur, suggestedRate }
+function getFifoSlices(movementIndex) {
+  const mv = movements[movementIndex];
+  if (!mv || mv.type !== 'expense' || mv.rateOverride || mv.paymentMethod !== 'Cash') return null;
+
+  const cur = mv.currency || 'EUR';
+  const amount = parseFloat(mv.amount) || 0;
+  if (amount === 0) return null;
+
+  // Build FIFO state just before this movement
+  const queues = buildFifoState(movementIndex - 1);
+  const queue = queues[cur] || [];
+
+  const slices = [];
+  let remaining = amount;
+
+  for (const t of queue) {
+    if (remaining <= 0) break;
+    const consume = Math.min(t.remaining, remaining);
+    if (consume > 0) {
+      slices.push({ rate: t.rate, amount: consume, eur: consume * t.rate });
+    }
+    remaining -= consume;
+  }
+
+  // If no FIFO available (e.g. EUR expense or no advance), use movement's own rate
+  if (slices.length === 0 && amount > 0) {
+    const rate = parseFloat(mv.rate) || DEFAULT_RATES[cur] || 1;
+    slices.push({ rate, amount, eur: amount * rate });
+  }
+
+  const totalEur = slices.reduce((s, sl) => s + sl.eur, 0);
+  const suggestedRate = amount > 0 ? totalEur / amount : (DEFAULT_RATES[cur] || 1);
+  return { slices, totalEur, suggestedRate };
+}
+
+// Get suggested rate for a new expense at position movementIndex
+function getSuggestedRate(currency, movementIndex) {
+  if (currency === 'EUR') return 1;
+  // Look at FIFO queue just before this index
+  const queues = buildFifoState(movementIndex - 1);
+  const queue = queues[currency];
+  if (queue) {
+    // Find first tranche with remaining > 0
+    const t = queue.find(x => x.remaining > 0);
+    if (t) return t.rate;
+  }
+  return DEFAULT_RATES[currency] || 1;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BALANCE CALCULATION
+// ══════════════════════════════════════════════════════════════════════════════
+function calcBalance() {
+  let totalAdvEur = 0, totalExpEur = 0;
+
+  for (let i = 0; i < movements.length; i++) {
+    const mv = movements[i];
+    if (mv.type === 'advance') {
+      totalAdvEur += parseFloat(mv.amountEur) || 0;
+    }
+    if (mv.type === 'expense') {
+      // Use FIFO-computed EUR for cash, stored amountEur for free movements
+      if (!mv.rateOverride && mv.paymentMethod === 'Cash') {
+        const sliceData = getFifoSlices(i);
+        totalExpEur += sliceData ? sliceData.totalEur : (parseFloat(mv.amountEur) || 0);
+      } else {
+        totalExpEur += parseFloat(mv.amountEur) || 0;
+      }
+    }
+  }
+
+  const finalEur = totalAdvEur - totalExpEur;
+
+  // Per-currency FIFO balances
+  const queues = buildFifoState();
+
+  return { totalAdvEur, totalExpEur, finalEur, queues };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
   buildCountryDropdowns();
   loadState();
   setupDragDrop();
   updateOnline();
-  window.addEventListener('online',updateOnline);
-  window.addEventListener('offline',updateOnline);
+  window.addEventListener('online', updateOnline);
+  window.addEventListener('offline', updateOnline);
 });
 
-function updateOnline(){
-  isOnline=navigator.onLine;
-  const t=document.getElementById('onlineTag');
-  t.textContent=isOnline?'● Online':'● Offline';
-  t.className=isOnline?'tag tag-online':'tag tag-offline';
+function updateOnline() {
+  isOnline = navigator.onLine;
+  const t = document.getElementById('onlineTag');
+  t.textContent = isOnline ? '● Online' : '● Offline';
+  t.className = isOnline ? 'tag tag-online' : 'tag tag-offline';
 }
 
-function showSection(name,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.section-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('section-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-  if(name==='signature') setTimeout(initSig,80);
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'signature') setTimeout(initSig, 80);
 }
 
-// ── COUNTRIES ─────────────────────────────────────────────────────────────────
-function buildCountryDropdowns(){
-  for(let i=0;i<3;i++){
-    const sel=document.getElementById('country'+i);
-    const ph=i===0?'— Country 1 —':`— Country ${i+1} (optional) —`;
-    sel.innerHTML=`<option value="">${ph}</option>`+COUNTRY_LIST.map(c=>`<option value="${c.name}">${c.flag} ${c.name}</option>`).join('');
+// ══════════════════════════════════════════════════════════════════════════════
+// COUNTRIES
+// ══════════════════════════════════════════════════════════════════════════════
+function buildCountryDropdowns() {
+  for (let i = 0; i < 3; i++) {
+    const sel = document.getElementById('country' + i);
+    const ph = i === 0 ? '— Country 1 —' : `— Country ${i + 1} (optional) —`;
+    sel.innerHTML = `<option value="">${ph}</option>` + COUNTRY_LIST.map(c => `<option value="${c.name}">${c.flag} ${c.name}</option>`).join('');
   }
 }
-function updateCountry(idx,val){
-  missionCountries[idx]=val;
-  const c=COUNTRY_LIST.find(x=>x.name===val);
-  const tag=document.getElementById('ctag'+idx);
-  if(c){tag.textContent=`${c.flag} ${c.currency}`;tag.style.display='inline-block';}
-  else tag.style.display='none';
+function updateCountry(idx, val) {
+  missionCountries[idx] = val;
+  const c = COUNTRY_LIST.find(x => x.name === val);
+  const tag = document.getElementById('ctag' + idx);
+  if (c) { tag.textContent = `${c.flag} ${c.currency}`; tag.style.display = 'inline-block'; }
+  else tag.style.display = 'none';
   autoSave();
 }
-function defaultCurrency(){
-  for(const n of missionCountries){if(n){const c=COUNTRY_LIST.find(x=>x.name===n);if(c)return c.currency;}}
+function defaultCurrency() {
+  for (const n of missionCountries) { if (n) { const c = COUNTRY_LIST.find(x => x.name === n); if (c) return c.currency; } }
   return 'EUR';
 }
 
-// ── API KEY ───────────────────────────────────────────────────────────────────
-function saveApiKey(){
-  ocrApiKey=document.getElementById('ocrApiKey').value.trim();
-  if(ocrApiKey){localStorage.setItem('ocrApiKey',ocrApiKey);document.getElementById('apiBanner').style.display='none';showToast('✓ API key saved');}
+// ══════════════════════════════════════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════════════════════════════════════
+function saveApiKey() {
+  ocrApiKey = document.getElementById('ocrApiKey').value.trim();
+  if (ocrApiKey) { localStorage.setItem('ocrApiKey', ocrApiKey); document.getElementById('apiBanner').style.display = 'none'; showToast('✓ API key saved'); }
 }
-function loadApiKey(){
-  const s=localStorage.getItem('ocrApiKey');
-  if(s){ocrApiKey=s;document.getElementById('ocrApiKey').value=s;document.getElementById('apiBanner').style.display='none';}
+function loadApiKey() {
+  const s = localStorage.getItem('ocrApiKey');
+  if (s) { ocrApiKey = s; document.getElementById('ocrApiKey').value = s; document.getElementById('apiBanner').style.display = 'none'; }
 }
 
-// ── UPLOAD / OCR ──────────────────────────────────────────────────────────────
-function setupDragDrop(){
-  const z=document.getElementById('uploadZone');
-  z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over');});
-  z.addEventListener('dragleave',()=>z.classList.remove('drag-over'));
-  z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('drag-over');handleFiles(e.dataTransfer.files);});
+// ══════════════════════════════════════════════════════════════════════════════
+// UPLOAD / OCR
+// ══════════════════════════════════════════════════════════════════════════════
+function setupDragDrop() {
+  const z = document.getElementById('uploadZone');
+  z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('drag-over'); });
+  z.addEventListener('dragleave', () => z.classList.remove('drag-over'));
+  z.addEventListener('drop', e => { e.preventDefault(); z.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
 }
-async function handleFiles(files){for(const f of Array.from(files)) await processFile(f);}
+async function handleFiles(files) { for (const f of Array.from(files)) await processFile(f); }
 
-async function processFile(file,addToId=null){
-  showOcrSt('processing',`🔍 Processing ${file.name}...`);
-  const dataUrl=await toDataUrl(file);
-  let ex={};
-  if(file.type!=='application/pdf'){
-    if(isOnline&&ocrApiKey){
-      try{ex=await ocrSpace(file);showOcrSt('success','✓ OCR.space: data extracted');}
-      catch(e){ex=await tesseract(dataUrl,file.name);}
-    } else ex=await tesseract(dataUrl,file.name);
-  } else showOcrSt('success','✓ PDF attached');
+async function processFile(file, addToId = null) {
+  showOcrSt('processing', `🔍 Processing ${file.name}...`);
+  const dataUrl = await toDataUrl(file);
+  let ex = {};
+  if (file.type !== 'application/pdf') {
+    if (isOnline && ocrApiKey) {
+      try { ex = await ocrSpace(file); showOcrSt('success', '✓ OCR.space: data extracted'); }
+      catch (e) { ex = await tesseract(dataUrl, file.name); }
+    } else ex = await tesseract(dataUrl, file.name);
+  } else showOcrSt('success', '✓ PDF attached');
 
-  if(addToId!==null){
-    const mv=movements.find(m=>m.id===addToId);
-    if(mv){mv.receipts.push(dataUrl);renderMovements();renderModal(addToId);autoSave();}
+  if (addToId !== null) {
+    const mv = movements.find(m => m.id === addToId);
+    if (mv) { mv.receipts.push(dataUrl); renderMovements(); renderModal(addToId); autoSave(); }
   } else {
-    addExpenseMove(ex,dataUrl);
+    addExpenseMove(ex, dataUrl);
     document.querySelectorAll('.section-tab')[2].click();
   }
-  setTimeout(()=>{document.getElementById('ocrStatus').style.display='none';},3000);
+  setTimeout(() => { document.getElementById('ocrStatus').style.display = 'none'; }, 3000);
 }
 
-function toDataUrl(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});}
+function toDataUrl(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); }); }
 
-async function ocrSpace(file){
-  const fd=new FormData();fd.append('file',file);fd.append('apikey',ocrApiKey);fd.append('language','eng');fd.append('isOverlayRequired','false');
-  const resp=await fetch('https://api.ocr.space/parse/image',{method:'POST',body:fd});
-  const d=await resp.json();
-  if(d.IsErroredOnProcessing) throw new Error(d.ErrorMessage);
-  return parseText(d.ParsedResults?.[0]?.ParsedText||'');
+async function ocrSpace(file) {
+  const fd = new FormData(); fd.append('file', file); fd.append('apikey', ocrApiKey); fd.append('language', 'eng'); fd.append('isOverlayRequired', 'false');
+  const resp = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
+  const d = await resp.json();
+  if (d.IsErroredOnProcessing) throw new Error(d.ErrorMessage);
+  return parseText(d.ParsedResults?.[0]?.ParsedText || '');
 }
-async function tesseract(dataUrl,name){
-  showOcrSt('processing',`🔍 Tesseract: ${name}...`);
-  try{
-    const r=await Tesseract.recognize(dataUrl,'eng',{logger:m=>{if(m.status==='recognizing text') showOcrSt('processing',`🔍 Tesseract: ${Math.round(m.progress*100)}%`);}});
-    showOcrSt('success','✓ Tesseract complete');
-    return parseText(r.data.text);
-  }catch(e){showOcrSt('error','⚠ OCR failed — enter data manually');return {};}
+async function tesseract(dataUrl, name) {
+  showOcrSt('processing', `🔍 Tesseract: ${name}...`);
+  try {
+    const r = await Tesseract.recognize(dataUrl, 'eng', { logger: m => { if (m.status === 'recognizing text') showOcrSt('processing', `🔍 Tesseract: ${Math.round(m.progress * 100)}%`); } });
+    showOcrSt('success', '✓ Tesseract complete'); return parseText(r.data.text);
+  } catch (e) { showOcrSt('error', '⚠ OCR failed'); return {}; }
 }
-function parseText(t){
-  const ex={};
-  const aRe=/(?:total|amount|sum|tot|totale|importo)[^\d]*(\d+[.,]\d{2})/i;
-  const fRe=/\b(\d{1,6}[.,]\d{2})\b/g;
-  for(const l of t.split('\n').map(x=>x.trim()).filter(Boolean)){const m=l.match(aRe);if(m){ex.amount=parseFloat(m[1].replace(',','.'));break;}}
-  if(!ex.amount){const all=[];let m;while((m=fRe.exec(t))!==null)all.push(parseFloat(m[1].replace(',','.')));if(all.length)ex.amount=Math.max(...all);}
-  const dm=t.match(/\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/);
-  if(dm){try{const p=dm[1].split(/[\/\-\.]/);let y=p[2],mo=p[1],d=p[0];if(y&&y.length===2)y='20'+y;if(parseInt(p[0])>31){y=p[0];d=p[2];}ex.date=`${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;}catch(e){}}
+function parseText(t) {
+  const ex = {};
+  const aRe = /(?:total|amount|sum|tot|totale|importo)[^\d]*(\d+[.,]\d{2})/i;
+  const fRe = /\b(\d{1,6}[.,]\d{2})\b/g;
+  for (const l of t.split('\n').map(x => x.trim()).filter(Boolean)) { const m = l.match(aRe); if (m) { ex.amount = parseFloat(m[1].replace(',', '.')); break; } }
+  if (!ex.amount) { const all = []; let m; while ((m = fRe.exec(t)) !== null) all.push(parseFloat(m[1].replace(',', '.'))); if (all.length) ex.amount = Math.max(...all); }
+  const dm = t.match(/\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/);
+  if (dm) { try { const p = dm[1].split(/[\/\-\.]/); let y = p[2], mo = p[1], d = p[0]; if (y && y.length === 2) y = '20' + y; if (parseInt(p[0]) > 31) { y = p[0]; d = p[2]; } ex.date = `${y}-${mo.padStart(2, '0')}-${d.padStart(2, '0')}`; } catch (e) { } }
   return ex;
 }
-function showOcrSt(type,msg){
-  const el=document.getElementById('ocrStatus');
-  el.className='ocr-status '+type;
-  el.innerHTML=type==='processing'?`<div class="spinner"></div> ${msg}`:msg;
-  el.style.display='flex';
+function showOcrSt(type, msg) {
+  const el = document.getElementById('ocrStatus');
+  el.className = 'ocr-status ' + type;
+  el.innerHTML = type === 'processing' ? `<div class="spinner"></div> ${msg}` : msg;
+  el.style.display = 'flex';
 }
 
-// ── MOVEMENTS ─────────────────────────────────────────────────────────────────
-function mkId(){return Date.now()+Math.random();}
-const today=()=>new Date().toISOString().split('T')[0];
+// ══════════════════════════════════════════════════════════════════════════════
+// MOVEMENT CREATION
+// ══════════════════════════════════════════════════════════════════════════════
+function mkId() { return Date.now() + Math.random(); }
+const todayStr = () => new Date().toISOString().split('T')[0];
 
-function addExpenseMove(data={},rcpt=null){
-  const cur=data.currency||defaultCurrency();
-  const rate=DEFAULT_RATES[cur]||1;
-  const mv={id:mkId(),type:'expense',date:data.date||today(),amount:data.amount||'',currency:cur,rate,amountEur:'',budgetLine:'',description:data.amount?'Extracted expense':'',docType:'Receipt',receipts:rcpt?[rcpt]:[]};
-  mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(2):'';
-  movements.push(mv);renderMovements();autoSave();
+function addExpenseMove(data = {}, rcpt = null) {
+  const cur = data.currency || defaultCurrency();
+  const idx = movements.length;
+  const rate = getSuggestedRate(cur, idx);
+  const mv = {
+    id: mkId(), type: 'expense', date: data.date || todayStr(),
+    amount: data.amount || '', currency: cur, rate,
+    rateOverride: false, paymentMethod: 'Cash',
+    amountEur: '', budgetLine: '', description: data.amount ? 'Extracted expense' : '',
+    docType: 'Receipt', receipts: rcpt ? [rcpt] : []
+  };
+  mv.amountEur = mv.amount ? (parseFloat(mv.amount) * rate).toFixed(2) : '';
+  movements.push(mv); renderMovements(); autoSave();
 }
 
-function addAdvance(){
-  const mv={id:mkId(),type:'advance',date:today(),amount:'',currency:defaultCurrency(),rate:DEFAULT_RATES[defaultCurrency()]||1,amountEur:'',description:'Cash advance',receipts:[]};
-  movements.push(mv);renderMovements();autoSave();
-  openModal(mv.id);
+function addAdvance() {
+  const mv = { id: mkId(), type: 'advance', date: todayStr(), amount: '', currency: defaultCurrency(), rate: DEFAULT_RATES[defaultCurrency()] || 1, amountEur: '', description: 'Cash advance', receipts: [] };
+  movements.push(mv); renderMovements(); autoSave(); openModal(mv.id);
 }
 
-function addExchange(){
-  const mv={id:mkId(),type:'exchange',date:today(),
-    fromCurrency:defaultCurrency(),fromAmount:'',
-    toCurrency:'EUR',toAmount:'',
-    rate:'',description:'Currency exchange',receipts:[]};
-  movements.push(mv);renderMovements();autoSave();
-  openModal(mv.id);
+function addExchange() {
+  const mv = { id: mkId(), type: 'exchange', date: todayStr(), fromCurrency: defaultCurrency(), fromAmount: '', toCurrency: 'EUR', toAmount: '', rate: '', description: 'Currency exchange', receipts: [] };
+  movements.push(mv); renderMovements(); autoSave(); openModal(mv.id);
 }
 
-function addExpenseManually(){addExpenseMove({});showToast('New expense — tap row to edit');}
+function addExpenseManually() { addExpenseMove({}); showToast('New expense — tap row to edit'); }
 
-function removeMovement(id){
-  if(!confirm('Delete this movement?'))return;
-  movements=movements.filter(m=>m.id!==id);
-  renderMovements();autoSave();closeExpModal();
+function removeMovement(id) {
+  if (!confirm('Delete this movement?')) return;
+  movements = movements.filter(m => m.id !== id);
+  renderMovements(); autoSave(); closeExpModal();
 }
 
-function updField(id,field,val){
-  const mv=movements.find(m=>m.id===id);if(!mv)return;
-  mv[field]=val;
-  if(mv.type==='expense'){
-    if(field==='amount'||field==='rate'){const a=parseFloat(mv.amount),r=parseFloat(mv.rate);mv.amountEur=(!isNaN(a)&&!isNaN(r))?(a*r).toFixed(2):'';}
-    if(field==='currency'){mv.rate=DEFAULT_RATES[val]||1;mv.amountEur=mv.amount?(parseFloat(mv.amount)*mv.rate).toFixed(2):'';}
+// ══════════════════════════════════════════════════════════════════════════════
+// FIELD UPDATE
+// ══════════════════════════════════════════════════════════════════════════════
+function updField(id, field, val) {
+  const mv = movements.find(m => m.id === id); if (!mv) return;
+  mv[field] = val;
+
+  if (mv.type === 'advance') {
+    if (field === 'amount' || field === 'rate') { const a = parseFloat(mv.amount), r = parseFloat(mv.rate); mv.amountEur = (!isNaN(a) && !isNaN(r)) ? (a * r).toFixed(2) : ''; }
+    if (field === 'currency') { mv.rate = DEFAULT_RATES[val] || 1; mv.amountEur = mv.amount ? (parseFloat(mv.amount) * mv.rate).toFixed(2) : ''; }
   }
-  if(mv.type==='advance'){
-    if(field==='amount'||field==='rate'){const a=parseFloat(mv.amount),r=parseFloat(mv.rate);mv.amountEur=(!isNaN(a)&&!isNaN(r))?(a*r).toFixed(2):'';}
-    if(field==='currency'){mv.rate=DEFAULT_RATES[val]||1;mv.amountEur=mv.amount?(parseFloat(mv.amount)*mv.rate).toFixed(2):'';}
-  }
-  if(mv.type==='exchange'){
-    // auto-calculate toAmount if rate and fromAmount are set
-    if(field==='fromAmount'||field==='rate'){
-      const fa=parseFloat(mv.fromAmount),r=parseFloat(mv.rate);
-      if(!isNaN(fa)&&!isNaN(r)&&r>0){mv.toAmount=(fa*r).toFixed(4);const ti=document.getElementById(`exto-${id}`);if(ti)ti.value=mv.toAmount;}
+
+  if (mv.type === 'expense') {
+    // If rate was manually changed, mark as override (free movement)
+    if (field === 'rate') { mv.rateOverride = true; mv.amountEur = mv.amount ? (parseFloat(mv.amount) * parseFloat(val)).toFixed(2) : ''; }
+    if (field === 'amount') { mv.amountEur = mv.amount ? (parseFloat(mv.amount) * (parseFloat(mv.rate) || 1)).toFixed(2) : ''; }
+    if (field === 'currency') {
+      const idx = movements.indexOf(mv);
+      mv.rate = getSuggestedRate(val, idx);
+      mv.rateOverride = false;
+      mv.amountEur = mv.amount ? (parseFloat(mv.amount) * mv.rate).toFixed(2) : '';
+      // update rate input in modal if open
+      const ri = document.getElementById('ri-' + id); if (ri) ri.value = mv.rate;
+    }
+    if (field === 'paymentMethod') {
+      // Switching to non-cash clears FIFO, switching back to Cash re-enables FIFO suggested rate
+      if (val === 'Cash' && mv.rateOverride) {
+        // keep override as-is — user explicitly set it
+      }
+      if (val !== 'Cash') {
+        // keep current rate but mark as override so FIFO doesn't consume it
+        mv.rateOverride = true;
+      }
     }
   }
-  renderMovements();autoSave();
-  const el=document.getElementById('meur-'+id);
-  if(el){
-    if(mv.type==='expense'||mv.type==='advance') el.textContent=mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—';
+
+  if (mv.type === 'exchange') {
+    if (field === 'fromAmount' || field === 'rate') {
+      const fa = parseFloat(mv.fromAmount), r = parseFloat(mv.rate);
+      if (!isNaN(fa) && !isNaN(r) && r > 0) { mv.toAmount = (fa * r).toFixed(4); const ti = document.getElementById('exto-' + id); if (ti) ti.value = mv.toAmount; }
+    }
   }
+
+  renderMovements(); autoSave();
+  // Update EUR display in open modal
+  const el = document.getElementById('meur-' + id);
+  if (el) el.textContent = mv.amountEur ? `€${parseFloat(mv.amountEur).toFixed(2)}` : '€—';
 }
 
-async function fetchRate(id){
-  const mv=movements.find(m=>m.id===id);if(!mv)return;
-  const btn=document.getElementById('fbtn-'+id);if(btn){btn.disabled=true;btn.textContent='...';}
-  const cur=mv.type==='exchange'?mv.fromCurrency:mv.currency;
-  const toCur=mv.type==='exchange'?mv.toCurrency:'EUR';
-  try{
-    const [y,m]=(mv.date||today()).split('-');
-    const d=await(await fetch(`https://api.frankfurter.app/${y}-${m}-01?from=${cur}&to=${toCur}`)).json();
-    const rate=d.rates?.[toCur];
-    if(rate){
-      if(mv.type==='exchange'){mv.rate=rate;const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;updField(id,'rate',rate);}
-      else{mv.rate=rate;mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(2):'';const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;}
-      renderMovements();autoSave();showToast(`✓ 1 ${cur} = ${rate} ${toCur}`);
+function resetRateToFifo(id) {
+  const mv = movements.find(m => m.id === id); if (!mv || mv.type !== 'expense') return;
+  const idx = movements.indexOf(mv);
+  mv.rate = getSuggestedRate(mv.currency, idx);
+  mv.rateOverride = false;
+  mv.amountEur = mv.amount ? (parseFloat(mv.amount) * mv.rate).toFixed(2) : '';
+  const ri = document.getElementById('ri-' + id); if (ri) ri.value = mv.rate;
+  renderMovements(); autoSave(); renderModal(id);
+  showToast('✓ Rate reset to FIFO');
+}
+
+async function fetchRate(id) {
+  const mv = movements.find(m => m.id === id); if (!mv) return;
+  const btn = document.getElementById('fbtn-' + id); if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  const cur = mv.type === 'exchange' ? mv.fromCurrency : mv.currency;
+  const toCur = mv.type === 'exchange' ? mv.toCurrency : 'EUR';
+  try {
+    const [y, m] = (mv.date || todayStr()).split('-');
+    const d = await (await fetch(`https://api.frankfurter.app/${y}-${m}-01?from=${cur}&to=${toCur}`)).json();
+    const rate = d.rates?.[toCur];
+    if (rate) {
+      if (mv.type === 'exchange') { mv.rate = rate; const ri = document.getElementById('ri-' + id); if (ri) ri.value = rate; updField(id, 'fromAmount', mv.fromAmount); }
+      else { mv.rate = rate; mv.rateOverride = true; mv.amountEur = mv.amount ? (parseFloat(mv.amount) * rate).toFixed(2) : ''; const ri = document.getElementById('ri-' + id); if (ri) ri.value = rate; }
+      renderMovements(); autoSave(); showToast(`✓ 1 ${cur} = ${rate} ${toCur}`);
     } else throw new Error('no rate');
-  }catch{
-    try{
-      const d=await(await fetch('https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN')).json();
-      const entry=d.find(r=>r.isoA3Code===cur);
-      if(entry){
-        const rate=1/entry.value;
-        mv.rate=rate;mv.amountEur=mv.amount?(parseFloat(mv.amount)*rate).toFixed(6):'';
-        const ri=document.getElementById('ri-'+id);if(ri)ri.value=rate;
-        renderMovements();autoSave();showToast('✓ InforEuro rate applied');
+  } catch {
+    try {
+      const d = await (await fetch('https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN')).json();
+      const entry = d.find(r => r.isoA3Code === cur);
+      if (entry) {
+        const rate = 1 / entry.value;
+        mv.rate = rate; mv.rateOverride = (mv.type === 'expense'); mv.amountEur = mv.amount ? (parseFloat(mv.amount) * rate).toFixed(2) : '';
+        const ri = document.getElementById('ri-' + id); if (ri) ri.value = rate;
+        renderMovements(); autoSave(); showToast('✓ InforEuro rate applied');
       } else showToast('⚠ Rate not found');
-    }catch{showToast('⚠ Offline — using default rate');}
+    } catch { showToast('⚠ Offline — using default rate'); }
   }
-  if(btn){btn.disabled=false;btn.textContent='Fetch';}
+  if (btn) { btn.disabled = false; btn.textContent = 'Fetch'; }
 }
 
-// ── BALANCE CALCULATION ────────────────────────────────────────────────────────
-function calcBalance(){
-  let totalAdvEur=0, totalExpEur=0;
-  // per-currency balances (in original currency)
-  const curBal={};
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER MOVEMENTS LIST
+// ══════════════════════════════════════════════════════════════════════════════
+function renderMovements() {
+  const list = document.getElementById('expensesList');
+  const count = document.getElementById('expensesCount');
+  const panel = document.getElementById('balancePanel');
+  count.textContent = `Movements (${movements.length})`;
 
-  for(const mv of movements){
-    if(mv.type==='advance'){
-      const eur=parseFloat(mv.amountEur)||0;
-      totalAdvEur+=eur;
-      const amt=parseFloat(mv.amount)||0;
-      const cur=mv.currency||'EUR';
-      curBal[cur]=(curBal[cur]||0)+amt;
-    }
-    if(mv.type==='expense'){
-      const eur=parseFloat(mv.amountEur)||0;
-      totalExpEur+=eur;
-      const amt=parseFloat(mv.amount)||0;
-      const cur=mv.currency||'EUR';
-      curBal[cur]=(curBal[cur]||0)-amt;
-    }
-    if(mv.type==='exchange'){
-      const fa=parseFloat(mv.fromAmount)||0;
-      const ta=parseFloat(mv.toAmount)||0;
-      const fc=mv.fromCurrency||'EUR';
-      const tc=mv.toCurrency||'EUR';
-      curBal[fc]=(curBal[fc]||0)-fa;
-      curBal[tc]=(curBal[tc]||0)+ta;
-    }
-  }
-  const finalEur=totalAdvEur-totalExpEur;
-  return{totalAdvEur,totalExpEur,finalEur,curBal};
-}
-
-// ── RENDER MOVEMENTS ──────────────────────────────────────────────────────────
-function renderMovements(){
-  const list=document.getElementById('expensesList');
-  const count=document.getElementById('expensesCount');
-  const panel=document.getElementById('balancePanel');
-
-  count.textContent=`Movements (${movements.length})`;
-
-  if(!movements.length){
-    list.innerHTML=`<div class="empty-state"><div class="ei">🧾</div><p>No movements yet.<br>Add a cash advance to start.</p></div>`;
-    panel.style.display='none';
-    return;
+  if (!movements.length) {
+    list.innerHTML = `<div class="empty-state"><div class="ei">🧾</div><p>No movements yet.<br>Add a cash advance to start.</p></div>`;
+    panel.style.display = 'none'; return;
   }
 
-  // Update balance panel
-  panel.style.display='block';
-  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
-  document.getElementById('bTotalAdvance').textContent=`€${totalAdvEur.toFixed(2)}`;
-  document.getElementById('bTotalExpense').textContent=`€${totalExpEur.toFixed(2)}`;
-  const bFinal=document.getElementById('bFinal');
-  const bAmt=document.getElementById('bFinalAmount');
-  const bNote=document.getElementById('bFinalNote');
-  bAmt.textContent=`€${Math.abs(finalEur).toFixed(2)}`;
-  if(finalEur>0.005){
-    bFinal.className='balance-final positive';
-    bNote.textContent='Amount to be returned to Administration Office';
-  } else if(finalEur<-0.005){
-    bFinal.className='balance-final negative';
-    bNote.textContent='Advance to be reimbursed to the operator';
-  } else {
-    bFinal.className='balance-final zero';
-    bNote.textContent='Balance settled — no further action required';
+  panel.style.display = 'block';
+  const { totalAdvEur, totalExpEur, finalEur, queues } = calcBalance();
+
+  // Balance panel
+  document.getElementById('bTotalAdvance').textContent = `€${totalAdvEur.toFixed(2)}`;
+  document.getElementById('bTotalExpense').textContent = `€${totalExpEur.toFixed(2)}`;
+  const bFinal = document.getElementById('bFinal');
+  document.getElementById('bFinalAmount').textContent = `€${Math.abs(finalEur).toFixed(2)}`;
+  if (finalEur > 0.005) { bFinal.className = 'balance-final positive'; document.getElementById('bFinalNote').textContent = 'Amount to be returned to Administration Office'; }
+  else if (finalEur < -0.005) { bFinal.className = 'balance-final negative'; document.getElementById('bFinalNote').textContent = 'Advance to be reimbursed to the operator'; }
+  else { bFinal.className = 'balance-final zero'; document.getElementById('bFinalNote').textContent = 'Balance settled'; }
+
+  // Currency FIFO details
+  const curKeys = Object.keys(queues).filter(c => queues[c].length > 0);
+  let curHtml = '';
+  for (const cur of curKeys) {
+    const tranches = queues[cur];
+    const total = tranches.reduce((s, t) => s + t.remaining, 0);
+    curHtml += `<div class="cur-tranche-group">
+      <div class="ctg-header"><span>${cur} Cash Balance</span><span>${total.toFixed(4)} ${cur}</span></div>
+      ${tranches.map(t => `<div class="tranche-row">
+        <span>Rate: <span class="tr-rate">${t.rate.toFixed(6)}</span></span>
+        <span class="tr-bal ${t.remaining < 0.0001 ? 'depleted' : ''}">${t.remaining.toFixed(4)} ${cur}</span>
+      </div>`).join('')}
+    </div>`;
   }
+  document.getElementById('curSection').innerHTML = curKeys.length
+    ? `<div class="cur-section-title">Cash Balances by Tranche</div>${curHtml}` : '';
 
-  // Per-currency balances
-  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
-  if(curKeys.length>0){
-    document.getElementById('curBalances').innerHTML=`
-      <div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:.06em;margin-top:10px;margin-bottom:4px">Currency Balances</div>
-      ${curKeys.map(c=>{
-        const v=curBal[c];
-        return`<div class="cur-bal-row"><span class="cname">${c}</span><span class="camount ${v<0?'neg':''}">${v>=0?'+':''}${v.toFixed(4)} ${c}</span></div>`;
-      }).join('')}`;
-  } else document.getElementById('curBalances').innerHTML='';
+  // Movement rows
+  const advances = movements.filter(m => m.type === 'advance');
+  const exchanges = movements.filter(m => m.type === 'exchange');
+  const expenses = movements.filter(m => m.type === 'expense');
+  let html = '';
 
-  // Render rows grouped by type
-  const advances=movements.filter(m=>m.type==='advance');
-  const expenses=movements.filter(m=>m.type==='expense');
-  const exchanges=movements.filter(m=>m.type==='exchange');
-
-  let html='';
-
-  if(advances.length){
-    html+=`<div class="list-divider">💰 Cash Advances</div>`;
-    html+=advances.map(mv=>{
-      const eur=parseFloat(mv.amountEur)||0;
-      return`<div class="exp-row type-advance" onclick="openModal(${mv.id})">
-        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
+  if (advances.length) {
+    html += `<div class="list-divider">💰 Cash Advances</div>`;
+    html += advances.map(mv => {
+      const eur = parseFloat(mv.amountEur) || 0;
+      const rateStr = mv.currency !== 'EUR' ? `<span class="exp-rate">${parseFloat(mv.rate).toFixed(4)}</span>` : `<span class="exp-rate"></span>`;
+      return `<div class="exp-row type-advance" onclick="openModal(${mv.id})">
+        <span class="exp-num">#${String(movements.indexOf(mv) + 1).padStart(2, '0')}</span>
         <span class="exp-type-badge badge-advance">ADV</span>
-        <span class="exp-date">${mv.date||'—'}</span>
-        <span class="exp-desc">${mv.description||'Cash advance'}</span>
+        <span class="exp-date">${mv.date || '—'}</span>
+        <span class="exp-desc">${mv.description || 'Cash advance'}</span>
+        ${rateStr}
         <span class="exp-eur pos">+€${eur.toFixed(2)}</span>
         <span class="exp-arrow">›</span>
       </div>`;
     }).join('');
   }
 
-  if(exchanges.length){
-    html+=`<div class="list-divider">↔ Currency Exchanges</div>`;
-    html+=exchanges.map(mv=>{
-      return`<div class="exp-row type-exchange" onclick="openModal(${mv.id})">
-        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
+  if (exchanges.length) {
+    html += `<div class="list-divider">↔ Currency Exchanges</div>`;
+    html += exchanges.map(mv => {
+      const rateStr = mv.rate ? `<span class="exp-rate">${parseFloat(mv.rate).toFixed(4)}</span>` : `<span class="exp-rate">—</span>`;
+      return `<div class="exp-row type-exchange" onclick="openModal(${mv.id})">
+        <span class="exp-num">#${String(movements.indexOf(mv) + 1).padStart(2, '0')}</span>
         <span class="exp-type-badge badge-exchange">EXC</span>
-        <span class="exp-date">${mv.date||'—'}</span>
-        <span class="exp-desc">${mv.description||'Currency exchange'}</span>
-        <span class="exp-eur exc">${mv.fromAmount||'?'} ${mv.fromCurrency} → ${mv.toAmount||'?'} ${mv.toCurrency}</span>
+        <span class="exp-date">${mv.date || '—'}</span>
+        <span class="exp-desc">${mv.description || 'Currency exchange'}</span>
+        ${rateStr}
+        <span class="exp-eur exc" style="min-width:90px;font-size:.8rem">${mv.fromAmount || '?'} ${mv.fromCurrency}→${mv.toAmount || '?'} ${mv.toCurrency}</span>
         <span class="exp-arrow">›</span>
       </div>`;
     }).join('');
   }
 
-  if(expenses.length){
-    html+=`<div class="list-divider">🧾 Expenses</div>`;
-    html+=expenses.map(mv=>{
-      const eur=parseFloat(mv.amountEur)||0;
-      const desc=mv.description||mv.budgetLine||'—';
-      const hasR=mv.receipts&&mv.receipts.length>0;
-      return`<div class="exp-row type-expense" onclick="openModal(${mv.id})">
-        <span class="exp-num">#${String(movements.indexOf(mv)+1).padStart(2,'0')}</span>
-        <span class="exp-type-badge badge-expense">EXP</span>
-        <span class="exp-date">${mv.date||'—'}</span>
+  if (expenses.length) {
+    html += `<div class="list-divider">🧾 Expenses</div>`;
+    html += expenses.map((mv, _) => {
+      const mvIdx = movements.indexOf(mv);
+      const isFree = mv.rateOverride || mv.paymentMethod !== 'Cash';
+      const sliceData = !isFree ? getFifoSlices(mvIdx) : null;
+      const totalEur = sliceData ? sliceData.totalEur : (parseFloat(mv.amountEur) || 0);
+      const desc = mv.description || mv.budgetLine || '—';
+      const hasR = mv.receipts && mv.receipts.length > 0;
+      const rateStr = mv.currency !== 'EUR'
+        ? `<span class="exp-rate" title="${isFree ? 'Manual/Card rate' : 'FIFO rate'}">${parseFloat(mv.rate).toFixed(4)}${isFree ? '*' : ''}</span>`
+        : `<span class="exp-rate"></span>`;
+      const payIcon = mv.paymentMethod === 'Cash' ? '💵' : mv.paymentMethod === 'Personal Card' ? '💳' : '🏢';
+      const multiTranche = sliceData && sliceData.slices.length > 1;
+
+      let rowHtml = `<div class="exp-row ${isFree ? 'type-expense free' : 'type-expense'}" onclick="openModal(${mv.id})" id="exprow-${mv.id}">
+        <span class="exp-num">#${String(mvIdx + 1).padStart(2, '0')}</span>
+        <span class="exp-type-badge ${isFree ? 'badge-free' : 'badge-expense'}" title="${mv.paymentMethod}">${payIcon}</span>
+        <span class="exp-date">${mv.date || '—'}</span>
         <span class="exp-desc">${desc}</span>
-        ${hasR?'<span class="exp-rcpt">🧾</span>':''}
-        <span class="exp-eur neg">-€${eur.toFixed(2)}</span>
+        ${rateStr}
+        ${hasR ? '<span class="exp-rcpt">🧾</span>' : ''}
+        <span class="exp-eur neg">-€${totalEur.toFixed(2)}</span>
         <span class="exp-arrow">›</span>
       </div>`;
+
+      if (multiTranche) {
+        rowHtml += `<div class="exp-multitranche">
+          <strong style="font-size:10px;display:block;margin-bottom:3px">Multi-tranche breakdown:</strong>
+          ${sliceData.slices.map((sl, i) => `<div class="mt-row">
+            <span>Tranche ${i + 1}: ${sl.amount.toFixed(4)} ${mv.currency} × ${sl.rate.toFixed(6)}</span>
+            <span>€${sl.eur.toFixed(2)}</span>
+          </div>`).join('')}
+          <div class="mt-row" style="font-weight:700;border-top:1px solid rgba(212,134,10,.3);margin-top:3px;padding-top:3px">
+            <span>Total</span><span>€${sliceData.totalEur.toFixed(2)}</span>
+          </div>
+        </div>`;
+      }
+
+      return rowHtml;
     }).join('');
   }
 
-  list.innerHTML=html;
+  list.innerHTML = html;
 }
 
-// ── MOVEMENT MODAL ────────────────────────────────────────────────────────────
-function openModal(id){renderModal(id);document.getElementById('expModal').classList.add('open');}
-function closeExpModal(){document.getElementById('expModal').classList.remove('open');}
-document.getElementById('expModal').addEventListener('click',function(e){if(e.target===this)closeExpModal();});
+// ══════════════════════════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════════════════════════
+function openModal(id) { renderModal(id); document.getElementById('expModal').classList.add('open'); }
+function closeExpModal() { document.getElementById('expModal').classList.remove('open'); }
+document.getElementById('expModal').addEventListener('click', function (e) { if (e.target === this) closeExpModal(); });
 
-function renderModal(id){
-  const mv=movements.find(m=>m.id===id);if(!mv)return;
-  const idx=movements.indexOf(mv)+1;
-  const typeLabel=mv.type==='advance'?'💰 Cash Advance':mv.type==='exchange'?'↔ Currency Exchange':'🧾 Expense';
-  document.getElementById('expModalTitle').textContent=`${typeLabel} — #${String(idx).padStart(2,'0')}`;
+function renderModal(id) {
+  const mv = movements.find(m => m.id === id); if (!mv) return;
+  const idx = movements.indexOf(mv) + 1;
+  const typeLabel = mv.type === 'advance' ? '💰 Cash Advance' : mv.type === 'exchange' ? '↔ Currency Exchange' : '🧾 Expense';
+  document.getElementById('expModalTitle').textContent = `${typeLabel} — #${String(idx).padStart(2, '0')}`;
 
-  let body='';
+  let body = '';
 
-  if(mv.type==='advance'){
-    body=`
+  // ── ADVANCE ──
+  if (mv.type === 'advance') {
+    body = `
     <div class="form-row c2">
-      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
-      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.currency?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date || ''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c => `<option value="${c}" ${c === mv.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
     </div>
     <div class="form-row c2">
-      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" value="${mv.amount||''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
+      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" value="${mv.amount || ''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
       <div class="form-group"><label>Rate to EUR</label>
-        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
-        <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
+        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate || ''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
+        <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline ? 'disabled' : ''}>Fetch</button></div>
       </div>
     </div>
-    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:#1a6e3c" id="meur-${id}">${mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—'}</div>
-    <div class="form-group" style="margin-bottom:14px"><label>Description / Source</label><input type="text" value="${mv.description||''}" placeholder="e.g., Project advance from HQ" onchange="updField(${id},'description',this.value)"></div>`;
+    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:#1a6e3c" id="meur-${id}">${mv.amountEur ? `€${parseFloat(mv.amountEur).toFixed(2)}` : '€—'}</div>
+    <div class="form-group" style="margin-bottom:14px"><label>Description / Source</label><input type="text" value="${mv.description || ''}" placeholder="e.g., Project advance from HQ" onchange="updField(${id},'description',this.value)"></div>`;
   }
 
-  if(mv.type==='exchange'){
-    body=`
+  // ── EXCHANGE ──
+  if (mv.type === 'exchange') {
+    body = `
     <div class="form-row c2">
-      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
-      <div class="form-group"><label>Description</label><input type="text" value="${mv.description||''}" placeholder="e.g., Cash exchange at airport" onchange="updField(${id},'description',this.value)"></div>
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date || ''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Description</label><input type="text" value="${mv.description || ''}" placeholder="e.g., Airport exchange" onchange="updField(${id},'description',this.value)"></div>
     </div>
     <div class="form-row c2">
-      <div class="form-group"><label>From Currency</label><select onchange="updField(${id},'fromCurrency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.fromCurrency?'selected':''}>${c}</option>`).join('')}</select></div>
-      <div class="form-group"><label>Amount given</label><input type="number" step="0.01" id="exfrom-${id}" value="${mv.fromAmount||''}" placeholder="0.00" onchange="updField(${id},'fromAmount',this.value)"></div>
+      <div class="form-group"><label>From Currency</label><select onchange="updField(${id},'fromCurrency',this.value)">${CURRENCIES.map(c => `<option value="${c}" ${c === mv.fromCurrency ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Amount given</label><input type="number" step="0.01" id="exfrom-${id}" value="${mv.fromAmount || ''}" placeholder="0.00" onchange="updField(${id},'fromAmount',this.value)"></div>
     </div>
     <div class="form-row c2">
-      <div class="form-group"><label>To Currency</label><select onchange="updField(${id},'toCurrency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.toCurrency?'selected':''}>${c}</option>`).join('')}</select></div>
-      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" id="exto-${id}" value="${mv.toAmount||''}" placeholder="0.00" onchange="updField(${id},'toAmount',this.value)"></div>
+      <div class="form-group"><label>To Currency</label><select onchange="updField(${id},'toCurrency',this.value)">${CURRENCIES.map(c => `<option value="${c}" ${c === mv.toCurrency ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Amount received</label><input type="number" step="0.01" id="exto-${id}" value="${mv.toAmount || ''}" placeholder="0.00" onchange="updField(${id},'toAmount',this.value)"></div>
     </div>
-    <div class="form-group" style="margin-bottom:14px"><label>Exchange Rate (1 From = X To)</label>
-      <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="auto" onchange="updField(${id},'rate',this.value)">
-      <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
+    <div class="form-group" style="margin-bottom:14px"><label>Exchange Rate (1 From → X To)</label>
+      <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate || ''}" placeholder="auto" onchange="updField(${id},'rate',this.value)">
+      <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline ? 'disabled' : ''}>Fetch</button></div>
     </div>`;
   }
 
-  if(mv.type==='expense'){
-    const rcptsHtml=`<div class="receipts-grid">
-      ${(mv.receipts||[]).map((r,ri)=>`<div class="rcpt-wrap"><img src="${r}" class="rcpt-thumb" onclick="previewImg('${id}',${ri})"><button class="rcpt-del" onclick="removeRcpt(${id},${ri})">✕</button></div>`).join('')}
+  // ── EXPENSE ──
+  if (mv.type === 'expense') {
+    const mvIdx = movements.indexOf(mv);
+    const isFree = mv.rateOverride || mv.paymentMethod !== 'Cash';
+    const sliceData = !isFree ? getFifoSlices(mvIdx) : null;
+    const displayEur = sliceData ? sliceData.totalEur : (parseFloat(mv.amountEur) || 0);
+
+    // FIFO info box
+    let fifoBox = '';
+    if (mv.paymentMethod === 'Cash' && !mv.rateOverride && sliceData) {
+      if (sliceData.slices.length > 1) {
+        fifoBox = `<div class="fifo-info"><strong>⚖ FIFO Multi-tranche Allocation</strong>
+          ${sliceData.slices.map((sl, i) => `<div class="fifo-row"><span>Tranche ${i + 1}: ${sl.amount.toFixed(4)} ${mv.currency} × ${sl.rate.toFixed(6)}</span><span>€${sl.eur.toFixed(2)}</span></div>`).join('')}
+          <div class="fifo-row" style="font-weight:700;border-top:1px solid rgba(212,134,10,.3);margin-top:3px;padding-top:3px"><span>Total EUR</span><span>€${sliceData.totalEur.toFixed(2)}</span></div>
+        </div>`;
+      } else if (sliceData.slices.length === 1) {
+        fifoBox = `<div class="fifo-info" style="background:#f0faf4;border-color:rgba(45,90,61,.2);color:var(--accent)"><strong>✓ FIFO Rate Applied</strong>
+          <div class="fifo-row"><span>Rate: ${sliceData.slices[0].rate.toFixed(6)}</span><span>€${sliceData.totalEur.toFixed(2)}</span></div>
+        </div>`;
+      }
+    }
+    if (isFree && mv.paymentMethod !== 'Cash') {
+      fifoBox = `<div class="fifo-info" style="background:#fff8e6;border-color:#f0c060;color:var(--warn)"><strong>ℹ ${mv.paymentMethod} — Free Movement</strong><div class="fifo-row"><span>Does not consume FIFO cash balance</span></div></div>`;
+    }
+    if (mv.rateOverride && mv.paymentMethod === 'Cash') {
+      fifoBox = `<div class="fifo-info"><strong>⚠ Manual Rate Override</strong>
+        <div class="fifo-row"><span>This expense uses a manual rate and does not consume FIFO balance.</span></div>
+        <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="resetRateToFifo(${id})">↺ Reset to FIFO rate</button>
+      </div>`;
+    }
+
+    const rcptsHtml = `<div class="receipts-grid">
+      ${(mv.receipts || []).map((r, ri) => `<div class="rcpt-wrap"><img src="${r}" class="rcpt-thumb" onclick="previewImg('${id}',${ri})"><button class="rcpt-del" onclick="removeRcpt(${id},${ri})">✕</button></div>`).join('')}
       <div class="rcpt-add"><input type="file" accept="image/*,.pdf" onchange="addRcptToExp(${id},this.files)">+</div>
     </div>`;
-    body=`
-    <div class="form-row c2">
-      <div class="form-group"><label>Date</label><input type="date" value="${mv.date||''}" onchange="updField(${id},'date',this.value)"></div>
-      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c=>`<option value="${c}" ${c===mv.currency?'selected':''}>${c}</option>`).join('')}</select></div>
-    </div>
-    <div class="form-row c2">
-      <div class="form-group"><label>Amount (local)</label><input type="number" step="0.01" value="${mv.amount||''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
-      <div class="form-group"><label>Rate to EUR</label>
-        <div class="rate-row"><input type="number" step="0.000001" id="ri-${id}" value="${mv.rate||''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)">
-        <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline?'disabled':''}>Fetch</button></div>
+
+    body = `
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Payment Method</label>
+      <div class="payment-pills">
+        ${PAY_METHODS.map(p => `<button class="payment-pill ${mv.paymentMethod === p ? 'active' : ''} ${p !== 'Cash' ? 'free' : ''}" onclick="setPayment(${id},'${p}')">${p === 'Cash' ? '💵' : p === 'Personal Card' ? '💳' : '🏢'} ${p}</button>`).join('')}
       </div>
     </div>
-    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--danger)" id="meur-${id}">${mv.amountEur?`€${parseFloat(mv.amountEur).toFixed(2)}`:'€—'}</div>
+    ${fifoBox}
     <div class="form-row c2">
-      <div class="form-group"><label>Budget Line</label><input type="text" value="${mv.budgetLine||''}" placeholder="e.g., Travel" onchange="updField(${id},'budgetLine',this.value)"></div>
-      <div class="form-group"><label>Document Type</label><select onchange="updField(${id},'docType',this.value)">${['Receipt','Invoice','Ticket','Bill','Contract','Other'].map(d=>`<option value="${d}" ${d===mv.docType?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Date</label><input type="date" value="${mv.date || ''}" onchange="updField(${id},'date',this.value)"></div>
+      <div class="form-group"><label>Currency</label><select onchange="updField(${id},'currency',this.value)">${CURRENCIES.map(c => `<option value="${c}" ${c === mv.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
     </div>
-    <div class="form-group" style="margin-bottom:14px"><label>Description</label><input type="text" value="${mv.description||''}" placeholder="Brief description" onchange="updField(${id},'description',this.value)"></div>
+    <div class="form-row c2">
+      <div class="form-group"><label>Amount (local)</label><input type="number" step="0.01" value="${mv.amount || ''}" placeholder="0.00" onchange="updField(${id},'amount',this.value)"></div>
+      <div class="form-group"><label>Rate to EUR ${isFree ? '(manual)' : '(FIFO)'}</label>
+        <div class="rate-row">
+          <input type="number" step="0.000001" id="ri-${id}" value="${mv.rate || ''}" placeholder="1.00" onchange="updField(${id},'rate',this.value)" ${!isFree && mv.paymentMethod === 'Cash' ? 'style="background:#f0faf4"' : ''}>
+          <button class="btn-fetch" id="fbtn-${id}" onclick="fetchRate(${id})" ${!isOnline ? 'disabled' : ''}>Fetch</button>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin:-4px 0 10px;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--danger)" id="meur-${id}">€${displayEur.toFixed(2)}</div>
+    <div class="form-row c2">
+      <div class="form-group"><label>Budget Line</label><input type="text" value="${mv.budgetLine || ''}" placeholder="e.g., Travel" onchange="updField(${id},'budgetLine',this.value)"></div>
+      <div class="form-group"><label>Document Type</label><select onchange="updField(${id},'docType',this.value)">${['Receipt', 'Invoice', 'Ticket', 'Bill', 'Contract', 'Other'].map(d => `<option value="${d}" ${d === mv.docType ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px"><label>Description</label><input type="text" value="${mv.description || ''}" placeholder="Brief description" onchange="updField(${id},'description',this.value)"></div>
     <div class="form-group" style="margin-bottom:14px"><label>Receipts / Documents</label>${rcptsHtml}</div>`;
   }
 
-  body+=`<button class="btn btn-danger btn-sm" onclick="removeMovement(${id})">🗑 Delete movement</button>`;
-  document.getElementById('expModalBody').innerHTML=body;
+  body += `<button class="btn btn-danger btn-sm" onclick="removeMovement(${id})">🗑 Delete</button>`;
+  document.getElementById('expModalBody').innerHTML = body;
 }
 
-async function addRcptToExp(id,files){for(const f of Array.from(files)) await processFile(f,id);}
-function removeRcpt(id,ri){const mv=movements.find(m=>m.id===id);if(!mv)return;mv.receipts.splice(ri,1);renderMovements();renderModal(id);autoSave();}
-function previewImg(id,ri){const mv=movements.find(m=>m.id===id);if(!mv||!mv.receipts[ri])return;document.getElementById('imgPrevSrc').src=mv.receipts[ri];document.getElementById('imgPrev').classList.add('open');}
-function closeImgPrev(){document.getElementById('imgPrev').classList.remove('open');}
-
-// ── SIGNATURE ─────────────────────────────────────────────────────────────────
-function initSig(){
-  const canvas=document.getElementById('sigCanvas');
-  const w=canvas.offsetWidth;
-  if(!w||w<20){setTimeout(initSig,100);return;}
-  canvas.width=w;canvas.height=180;
-  const ctx=canvas.getContext('2d');
-  ctx.strokeStyle='#1a1a18';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';
-  if(signatureData){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,w,180);img.src=signatureData;}
-  if(sigReady)return;
-  sigReady=true;
-  let drawing=false,lx=0,ly=0;
-  function pos(e){const r=canvas.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];}
-  canvas.addEventListener('pointerdown',e=>{e.preventDefault();try{canvas.setPointerCapture(e.pointerId);}catch(_){}drawing=true;[lx,ly]=pos(e);ctx.beginPath();ctx.arc(lx,ly,1.2,0,Math.PI*2);ctx.fillStyle='#1a1a18';ctx.fill();},{passive:false});
-  canvas.addEventListener('pointermove',e=>{e.preventDefault();if(!drawing)return;const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();lx=x;ly=y;},{passive:false});
-  canvas.addEventListener('pointerup',()=>drawing=false);
-  canvas.addEventListener('pointerleave',()=>drawing=false);
-  canvas.addEventListener('pointercancel',()=>drawing=false);
+function setPayment(id, method) {
+  const mv = movements.find(m => m.id === id); if (!mv) return;
+  mv.paymentMethod = method;
+  if (method !== 'Cash') { mv.rateOverride = true; }
+  else {
+    // Reset to FIFO rate when switching back to cash
+    const idx = movements.indexOf(mv);
+    if (!mv.rateOverride) mv.rate = getSuggestedRate(mv.currency, idx);
+  }
+  renderMovements(); autoSave(); renderModal(id);
 }
-function clearSig(){const c=document.getElementById('sigCanvas');c.getContext('2d').clearRect(0,0,c.width,c.height);sigReady=false;signatureData=null;document.getElementById('sigStatus').textContent='Not signed';setTimeout(initSig,50);autoSave();}
-function saveSig(){signatureData=document.getElementById('sigCanvas').toDataURL('image/png');document.getElementById('sigStatus').textContent='✓ Signature saved';showToast('✓ Signature saved');autoSave();}
 
-// ── EXPORT PDF ────────────────────────────────────────────────────────────────
-async function exportPDF(){
-  if(!movements.length){showToast('⚠ No movements to export');return;}
-  if(!signatureData&&!confirm('No signature saved. Export anyway?'))return;
-  const{jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const M=14,PW=210,CW=PW-M*2;
-  const g=id=>document.getElementById(id).value||'';
-  const rn=g('reportName')||'Expense Report',pn=g('personName'),proj=g('projectName'),pid=g('projectId'),sd=g('startDate'),ed=g('endDate');
-  const countries=missionCountries.filter(Boolean).join(', ');
+async function addRcptToExp(id, files) { for (const f of Array.from(files)) await processFile(f, id); }
+function removeRcpt(id, ri) { const mv = movements.find(m => m.id === id); if (!mv) return; mv.receipts.splice(ri, 1); renderMovements(); renderModal(id); autoSave(); }
+function previewImg(id, ri) { const mv = movements.find(m => m.id === id); if (!mv || !mv.receipts[ri]) return; document.getElementById('imgPrevSrc').src = mv.receipts[ri]; document.getElementById('imgPrev').classList.add('open'); }
+function closeImgPrev() { document.getElementById('imgPrev').classList.remove('open'); }
 
-  doc.setFillColor(26,31,46);doc.rect(0,0,PW,36,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(16);doc.setFont('helvetica','bold');doc.text(rn,M,13);
-  doc.setFontSize(8);doc.setFont('helvetica','normal');
-  const meta=[pn&&`By: ${pn}`,proj&&`Project: ${proj}`,pid&&`ID: ${pid}`,countries&&`Countries: ${countries}`,(sd||ed)&&`Period: ${sd} – ${ed}`].filter(Boolean).join('   ');
-  doc.text(meta,M,22);doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`,M,29);
-  doc.setTextColor(0,0,0);
-
-  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
-
-  // Advances table
-  const advances=movements.filter(m=>m.type==='advance');
-  if(advances.length){
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Cash Advances',M,44);
-    doc.autoTable({startY:47,head:[['#','Date','Amount','Currency','Rate','EUR','Description']],
-      body:advances.map((m,i)=>[i+1,m.date||'',m.amount||'',m.currency||'',m.rate?parseFloat(m.rate).toFixed(4):'',m.amountEur?`€${parseFloat(m.amountEur).toFixed(2)}`:'',(m.description||'')]),
-      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[20,100,60],textColor:255,fontStyle:'bold'},
-      margin:{left:M,right:M}});
-  }
-
-  // Exchanges table
-  const exchanges=movements.filter(m=>m.type==='exchange');
-  let yAfterAdv=advances.length?doc.lastAutoTable.finalY+6:44;
-  if(exchanges.length){
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Currency Exchanges',M,yAfterAdv+6);
-    doc.autoTable({startY:yAfterAdv+9,head:[['#','Date','From Amt','From Cur','To Amt','To Cur','Rate','Description']],
-      body:exchanges.map((m,i)=>[i+1,m.date||'',m.fromAmount||'',m.fromCurrency||'',m.toAmount||'',m.toCurrency||'',m.rate?parseFloat(m.rate).toFixed(4):(m.description||'')]),
-      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[29,78,216],textColor:255,fontStyle:'bold'},
-      margin:{left:M,right:M}});
-  }
-
-  // Expenses table
-  const expenses=movements.filter(m=>m.type==='expense');
-  let yAfterExc=(exchanges.length||(advances.length&&!exchanges.length))?doc.lastAutoTable.finalY+6:44;
-  if(expenses.length){
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.text('Expenses',M,yAfterExc+6);
-    const expRows=expenses.map((m,i)=>[i+1,m.date||'',m.amount||'',m.currency||'',m.rate?parseFloat(m.rate).toFixed(4):'',m.amountEur?`€${parseFloat(m.amountEur).toFixed(2)}`:'',(m.budgetLine||''),(m.docType||''),(m.description||'')]);
-    expRows.push(['','','','','TOTAL',`€${totalExpEur.toFixed(2)}`,'','','']);
-    doc.autoTable({startY:yAfterExc+9,head:[['#','Date','Amount','Cur.','Rate','EUR','Budget','Doc','Description']],body:expRows,
-      styles:{fontSize:8,cellPadding:2},headStyles:{fillColor:[45,90,61],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[248,246,242]},
-      columnStyles:{8:{cellWidth:32}},margin:{left:M,right:M}});
-  }
-
-  let y=doc.lastAutoTable?doc.lastAutoTable.finalY+10:60;
-
-  // BALANCE SUMMARY BOX
-  if(y>240){doc.addPage();y=14;}
-  doc.setFillColor(26,31,46);doc.rect(M,y,CW,28,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
-  doc.text('FINANCIAL SUMMARY',M+4,y+6);
-  doc.setFont('helvetica','normal');doc.setFontSize(8);
-  doc.text(`Total Advances: €${totalAdvEur.toFixed(2)}   Total Expenses: €${totalExpEur.toFixed(2)}`,M+4,y+13);
-  const balNote=finalEur>0.005?`BALANCE: €${finalEur.toFixed(2)} — Amount to be returned to Administration Office`:
-    finalEur<-0.005?`BALANCE: €${Math.abs(finalEur).toFixed(2)} — Advance to be reimbursed to the operator`:
-    'BALANCE: €0.00 — Settled';
-  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(balNote,M+4,y+22);
-  doc.setTextColor(0,0,0);y+=34;
-
-  // Currency balances
-  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
-  if(curKeys.length){
-    if(y>255){doc.addPage();y=14;}
-    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('Currency Balances:',M,y);y+=5;
-    doc.setFont('helvetica','normal');
-    curKeys.forEach(c=>{doc.text(`  ${c}: ${curBal[c]>=0?'+':''}${curBal[c].toFixed(4)}`,M,y);y+=4;});
-    y+=4;
-  }
-
-  // Signature
-  if(signatureData){
-    if(y>255){doc.addPage();y=14;}
-    doc.setFontSize(8);doc.setTextColor(120,120,120);doc.text('Signature:',M,y);y+=3;
-    doc.addImage(signatureData,'PNG',M,y,55,18);y+=20;
-    doc.setFontSize(9);doc.setTextColor(0,0,0);doc.text(pn||'Reporting Person',M,y);y+=8;
-  }
-
-  // Receipt images
-  const imgs=expenses.flatMap((mv,i)=>(mv.receipts||[]).map(r=>({r,label:`Exp #${movements.indexOf(mv)+1} — ${mv.date||''} — ${mv.description||''}`}))).filter(x=>!x.r.startsWith('data:application/pdf'));
-  if(imgs.length){
-    if(y>240){doc.addPage();y=14;}
-    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Attached Documents',M,y);y+=7;doc.setFont('helvetica','normal');
-    for(const{r,label}of imgs){
-      const{w:iw,h:ih}=await imgDims(r);
-      let dw=CW,dh=CW*(ih/iw);
-      if(dh>110){dh=110;dw=110*(iw/ih);}
-      if(y+dh+12>282){doc.addPage();y=14;}
-      doc.setFontSize(7);doc.setTextColor(130,130,130);doc.text(label,M,y);y+=3;
-      const fmt=r.startsWith('data:image/png')?'PNG':'JPEG';
-      try{doc.addImage(r,fmt,M,y,dw,dh);}catch(e){try{doc.addImage(r,fmt==='PNG'?'JPEG':'PNG',M,y,dw,dh);}catch(_){}}
-      y+=dh+8;doc.setTextColor(0,0,0);
-    }
-  }
-
-  doc.save(`${rn.replace(/\s+/g,'_')}_expense_report.pdf`);showToast('✓ PDF exported');
+// ══════════════════════════════════════════════════════════════════════════════
+// SIGNATURE
+// ══════════════════════════════════════════════════════════════════════════════
+function initSig() {
+  const canvas = document.getElementById('sigCanvas');
+  const w = canvas.offsetWidth; if (!w || w < 20) { setTimeout(initSig, 100); return; }
+  canvas.width = w; canvas.height = 180;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#1a1a18'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (signatureData) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0, w, 180); img.src = signatureData; }
+  if (sigReady) return; sigReady = true;
+  let drawing = false, lx = 0, ly = 0;
+  function pos(e) { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  canvas.addEventListener('pointerdown', e => { e.preventDefault(); try { canvas.setPointerCapture(e.pointerId); } catch (_) { } drawing = true; [lx, ly] = pos(e); ctx.beginPath(); ctx.arc(lx, ly, 1.2, 0, Math.PI * 2); ctx.fillStyle = '#1a1a18'; ctx.fill(); }, { passive: false });
+  canvas.addEventListener('pointermove', e => { e.preventDefault(); if (!drawing) return; const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(x, y); ctx.stroke(); lx = x; ly = y; }, { passive: false });
+  canvas.addEventListener('pointerup', () => drawing = false);
+  canvas.addEventListener('pointerleave', () => drawing = false);
+  canvas.addEventListener('pointercancel', () => drawing = false);
 }
-function imgDims(src){return new Promise(res=>{const i=new Image();i.onload=()=>res({w:i.naturalWidth,h:i.naturalHeight});i.onerror=()=>res({w:1,h:1});i.src=src;});}
+function clearSig() { const c = document.getElementById('sigCanvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height); sigReady = false; signatureData = null; document.getElementById('sigStatus').textContent = 'Not signed'; setTimeout(initSig, 50); autoSave(); }
+function saveSig() { signatureData = document.getElementById('sigCanvas').toDataURL('image/png'); document.getElementById('sigStatus').textContent = '✓ Signature saved'; showToast('✓ Signature saved'); autoSave(); }
 
-// ── EXPORT ODS ────────────────────────────────────────────────────────────────
-async function exportODS(){
-  if(!movements.length){showToast('⚠ No movements to export');return;}
-  const g=id=>document.getElementById(id).value||'';
-  const rn=g('reportName')||'Expense Report';
-  const pn=g('personName'),proj=g('projectName'),pid=g('projectId'),sd=g('startDate'),ed=g('endDate');
-  const countries=missionCountries.filter(Boolean).join(', ');
-  const{totalAdvEur,totalExpEur,finalEur,curBal}=calcBalance();
+// ══════════════════════════════════════════════════════════════════════════════
+// EXPORT PDF
+// ══════════════════════════════════════════════════════════════════════════════
+async function exportPDF() {
+  if (!movements.length) { showToast('⚠ No movements to export'); return; }
+  if (!signatureData && !confirm('No signature saved. Export anyway?')) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const M = 14, PW = 210, CW = PW - M * 2;
+  const g = id => document.getElementById(id).value || '';
+  const rn = g('reportName') || 'Expense Report', pn = g('personName'), proj = g('projectName'), pid = g('projectId'), sd = g('startDate'), ed = g('endDate');
+  const countries = missionCountries.filter(Boolean).join(', ');
 
-  // Helper: escape XML
-  const xe=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  doc.setFillColor(26, 31, 46); doc.rect(0, 0, PW, 36, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.text(rn, M, 13);
+  doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+  const meta = [pn && `By: ${pn}`, proj && `Project: ${proj}`, pid && `ID: ${pid}`, countries && `Countries: ${countries}`, (sd || ed) && `Period: ${sd} – ${ed}`].filter(Boolean).join('   ');
+  doc.text(meta, M, 22); doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, M, 29);
+  doc.setTextColor(0, 0, 0);
 
-  // Build rows as arrays of cell values
-  const rows=[];
-  const hdr=(v)=>`<table:table-cell table:style-name="ce-header"><text:p>${xe(v)}</text:p></table:table-cell>`;
-  const cell=(v)=>`<table:table-cell office:value-type="string"><text:p>${xe(v)}</text:p></table:table-cell>`;
-  const num=(v)=>{const n=parseFloat(v);return isNaN(n)?`<table:table-cell office:value-type="string"><text:p></text:p></table:table-cell>`:`<table:table-cell office:value-type="float" office:value="${n}"><text:p>${n}</text:p></table:table-cell>`;};
-
-  function row(cells){return`<table:table-row>${cells.join('')}</table:table-row>`;}
-  function emptyRow(){return`<table:table-row><table:table-cell/></table:table-row>`;}
-
-  let tableRows='';
-
-  // Header info
-  tableRows+=row([hdr('EXPENSE REPORT')]);
-  tableRows+=row([cell('Report Name:'),cell(rn)]);
-  tableRows+=row([cell('Person Reporting:'),cell(pn)]);
-  tableRows+=row([cell('Project:'),cell(proj)]);
-  tableRows+=row([cell('Project ID:'),cell(pid)]);
-  tableRows+=row([cell('Countries:'),cell(countries)]);
-  tableRows+=row([cell('Period:'),cell(`${sd} – ${ed}`)]);
-  tableRows+=row([cell('Generated:'),cell(new Date().toLocaleDateString('en-GB'))]);
-  tableRows+=emptyRow();
+  const { totalAdvEur, totalExpEur, finalEur, queues } = calcBalance();
+  let startY = 42;
 
   // Advances
-  const advances=movements.filter(m=>m.type==='advance');
-  if(advances.length){
-    tableRows+=row([hdr('CASH ADVANCES')]);
-    tableRows+=row(['#','Date','Amount','Currency','Rate','EUR','Description'].map(hdr));
-    advances.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.amount),cell(m.currency||''),num(m.rate),num(m.amountEur),cell(m.description||'')]);});
-    tableRows+=emptyRow();
+  const advances = movements.filter(m => m.type === 'advance');
+  if (advances.length) {
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text('Cash Advances', M, startY); startY += 3;
+    doc.autoTable({ startY, head: [['#', 'Date', 'Amount', 'Currency', 'Rate', 'EUR', 'Description']], body: advances.map((m, i) => [i + 1, m.date || '', m.amount || '', m.currency || '', m.rate ? parseFloat(m.rate).toFixed(6) : '', m.amountEur ? `€${parseFloat(m.amountEur).toFixed(2)}` : '', m.description || '']), styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [20, 100, 60], textColor: 255, fontStyle: 'bold' }, margin: { left: M, right: M } });
+    startY = doc.lastAutoTable.finalY + 6;
   }
 
   // Exchanges
-  const exchanges=movements.filter(m=>m.type==='exchange');
-  if(exchanges.length){
-    tableRows+=row([hdr('CURRENCY EXCHANGES')]);
-    tableRows+=row(['#','Date','From Amount','From Currency','To Amount','To Currency','Rate','Description'].map(hdr));
-    exchanges.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.fromAmount),cell(m.fromCurrency||''),num(m.toAmount),cell(m.toCurrency||''),num(m.rate),cell(m.description||'')]);});
-    tableRows+=emptyRow();
+  const exchanges = movements.filter(m => m.type === 'exchange');
+  if (exchanges.length) {
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text('Currency Exchanges', M, startY); startY += 3;
+    doc.autoTable({ startY, head: [['#', 'Date', 'From Amt', 'From', 'To Amt', 'To', 'Rate', 'Description']], body: exchanges.map((m, i) => [i + 1, m.date || '', m.fromAmount || '', m.fromCurrency || '', m.toAmount || '', m.toCurrency || '', m.rate ? parseFloat(m.rate).toFixed(6) : '', m.description || '']), styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [29, 78, 216], textColor: 255, fontStyle: 'bold' }, margin: { left: M, right: M } });
+    startY = doc.lastAutoTable.finalY + 6;
   }
 
   // Expenses
-  const expenses=movements.filter(m=>m.type==='expense');
-  if(expenses.length){
-    tableRows+=row([hdr('EXPENSES')]);
-    tableRows+=row(['#','Date','Amount','Currency','Rate','EUR','Budget Line','Doc Type','Description'].map(hdr));
-    expenses.forEach((m,i)=>{tableRows+=row([cell(i+1),cell(m.date||''),num(m.amount),cell(m.currency||''),num(m.rate),num(m.amountEur),cell(m.budgetLine||''),cell(m.docType||''),cell(m.description||'')]);});
-    tableRows+=row([cell(''),cell(''),cell(''),cell(''),hdr('TOTAL'),num(totalExpEur),cell(''),cell(''),cell('')]);
-    tableRows+=emptyRow();
-  }
-
-  // Balance summary
-  tableRows+=row([hdr('FINANCIAL SUMMARY')]);
-  tableRows+=row([cell('Total Advances (EUR):'),num(totalAdvEur)]);
-  tableRows+=row([cell('Total Expenses (EUR):'),num(totalExpEur)]);
-  tableRows+=row([hdr('Final Balance (EUR):'),num(finalEur)]);
-  const note=finalEur>0.005?'Amount to be returned to Administration Office':finalEur<-0.005?'Advance to be reimbursed to the operator':'Balance settled';
-  tableRows+=row([cell('Note:'),cell(note)]);
-  tableRows+=emptyRow();
-
-  const curKeys=Object.keys(curBal).filter(c=>Math.abs(curBal[c])>0.0001);
-  if(curKeys.length){
-    tableRows+=row([hdr('CURRENCY BALANCES')]);
-    tableRows+=row([hdr('Currency'),hdr('Balance')]);
-    curKeys.forEach(c=>{tableRows+=row([cell(c),num(curBal[c])]);});
-  }
-
-  const content=`<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  xmlns:office_value="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-  office:version="1.3">
-<office:automatic-styles>
-  <style:style style:name="ce-header" style:family="table-cell">
-    <style:text-properties fo:font-weight="bold"/>
-  </style:style>
-</office:automatic-styles>
-<office:body><office:spreadsheet>
-<table:table table:name="Expense Report">
-${tableRows}
-</table:table>
-</office:spreadsheet></office:body></office:document-content>`;
-
-  const manifest=`<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3">
-  <manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>
-  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
-  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>`;
-
-  const meta=`<?xml version="1.0" encoding="UTF-8"?>
-<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.3">
-<office:meta><dc:title>${xe(rn)}</dc:title></office:meta></office:document-meta>`;
-
-  const mimetype='application/vnd.oasis.opendocument.spreadsheet';
-
-  const zip=new JSZip();
-  zip.file('mimetype',mimetype,{compression:'STORE'});
-  zip.folder('META-INF').file('manifest.xml',manifest);
-  zip.file('content.xml',content);
-  zip.file('meta.xml',meta);
-
-  const blob=await zip.generateAsync({type:'blob',mimeType:mimetype,compression:'DEFLATE',compressionOptions:{level:6}});
-  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`${rn.replace(/\s+/g,'_')}_expense_report.ods`});
-  a.click();URL.revokeObjectURL(a.href);
-  showToast('✓ ODS exported');
-}
-
-// ── NEW REPORT ────────────────────────────────────────────────────────────────
-function newReport(){
-  if(movements.length&&!confirm('Start a new report? Current data will be cleared.'))return;
-  movements=[];signatureData=null;missionCountries=['','',''];sigReady=false;
-  ['reportName','startDate','endDate','personName','projectName','projectId'].forEach(id=>document.getElementById(id).value='');
-  for(let i=0;i<3;i++){document.getElementById('country'+i).value='';document.getElementById('ctag'+i).style.display='none';}
-  document.getElementById('sigStatus').textContent='Not signed';
-  renderMovements();autoSave();showToast('New report started');
-}
-
-// ── PERSIST ───────────────────────────────────────────────────────────────────
-function autoSave(){
-  try{localStorage.setItem('expenseReportState',JSON.stringify({
-    reportName:document.getElementById('reportName').value,startDate:document.getElementById('startDate').value,
-    endDate:document.getElementById('endDate').value,personName:document.getElementById('personName').value,
-    projectName:document.getElementById('projectName').value,projectId:document.getElementById('projectId').value,
-    movements,signatureData,missionCountries
-  }));}catch(e){}
-}
-function loadState(){
-  loadApiKey();
-  try{
-    const raw=localStorage.getItem('expenseReportState');if(!raw)return;
-    const s=JSON.parse(raw);
-    ['reportName','startDate','endDate','personName','projectName','projectId'].forEach(id=>{if(s[id]!==undefined)document.getElementById(id).value=s[id];});
-    // migrate old format
-    if(s.expenses&&!s.movements){
-      movements=s.expenses.map(e=>{if(!e.receipts){e.receipts=e.receipt?[e.receipt]:[];delete e.receipt;}e.type=e.type||'expense';return e;});
-    } else {
-      movements=s.movements||[];
-      movements.forEach(m=>{if(!m.receipts)m.receipts=[];});
+  const expenses = movements.filter(m => m.type === 'expense');
+  if (expenses.length) {
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text('Expenses', M, startY); startY += 3;
+    const expRows = [];
+    for (let i = 0; i < expenses.length; i++) {
+      const mv = expenses[i]; const mvIdx = movements.indexOf(mv);
+      const isFree = mv.rateOverride || mv.paymentMethod !== 'Cash';
+      const sliceData = !isFree ? getFifoSlices(mvIdx) : null;
+      const totalEur = sliceData ? sliceData.totalEur : (parseFloat(mv.amountEur) || 0);
+      const rateDisplay = sliceData && sliceData.slices.length > 1 ? 'multi' : parseFloat(mv.rate).toFixed(6);
+      expRows.push([i + 1, mv.date || '', mv.amount || '', mv.currency || '', rateDisplay, `€${totalEur.toFixed(2)}`, mv.paymentMethod || 'Cash', mv.budgetLine || '', mv.docType || '', mv.description || '']);
+      // Multi-tranche sub-rows
+      if (sliceData && sliceData.slices.length > 1) {
+        sliceData.slices.forEach((sl, si) => {
+          expRows.push(['', '', `  T${si + 1}: ${sl.amount.toFixed(4)}`, mv.currency, sl.rate.toFixed(6), `€${sl.eur.toFixed(2)}`, '', '', '', '']);
+        });
+      }
     }
-    signatureData=s.signatureData||null;
-    if(signatureData)document.getElementById('sigStatus').textContent='✓ Signature saved';
-    missionCountries=s.missionCountries||['','',''];
-    missionCountries.forEach((n,i)=>{if(n){document.getElementById('country'+i).value=n;updateCountry(i,n);}});
-    renderMovements();
-  }catch(e){console.warn(e);}
+    expRows.push(['', '', '', '', '', `€${totalExpEur.toFixed(2)}`, 'TOTAL', '', '', '']);
+    doc.autoTable({ startY, head: [['#', 'Date', 'Amount', 'Cur', 'Rate', 'EUR', 'Method', 'Budget', 'Doc', 'Description']], body: expRows, styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: [45, 90, 61], textColor: 255, fontStyle: 'bold' }, alternateRowStyles: { fillColor: [248, 246, 242] }, columnStyles: { 9: { cellWidth: 28 } }, margin: { left: M, right: M } });
+    startY = doc.lastAutoTable.finalY + 6;
+  }
+
+  // Financial summary box
+  if (startY > 240) { doc.addPage(); startY = 14; }
+  doc.setFillColor(26, 31, 46); doc.rect(M, startY, CW, 30, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.text('FINANCIAL SUMMARY', M + 4, startY + 6);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+  doc.text(`Total Advances: €${totalAdvEur.toFixed(2)}   Total Expenses: €${totalExpEur.toFixed(2)}`, M + 4, startY + 13);
+  const balNote = finalEur > 0.005 ? `BALANCE: €${finalEur.toFixed(2)} — Amount to be returned to Administration Office` : finalEur < -0.005 ? `BALANCE: €${Math.abs(finalEur).toFixed(2)} — Advance to be reimbursed to the operator` : 'BALANCE: €0.00 — Settled';
+  doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.text(balNote, M + 4, startY + 20);
+  doc.setTextColor(0, 0, 0); startY += 36;
+
+  // Currency tranche balances
+  const curKeys = Object.keys(queues).filter(c => queues[c].length > 0);
+  if (curKeys.length) {
+    if (startY > 255) { doc.addPage(); startY = 14; }
+    doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.text('Cash Balances by Tranche:', M, startY); startY += 5;
+    doc.setFont('helvetica', 'normal');
+    for (const cur of curKeys) {
+      queues[cur].forEach((t, i) => { doc.text(`  ${cur} Tranche ${i + 1}: ${t.remaining.toFixed(4)} remaining (rate: ${t.rate.toFixed(6)})`, M, startY); startY += 4; });
+    }
+    startY += 4;
+  }
+
+  // Signature
+  if (signatureData) {
+    if (startY > 255) { doc.addPage(); startY = 14; }
+    doc.setFontSize(8); doc.setTextColor(120, 120, 120); doc.text('Signature:', M, startY); startY += 3;
+    doc.addImage(signatureData, 'PNG', M, startY, 55, 18); startY += 20;
+    doc.setFontSize(9); doc.setTextColor(0, 0, 0); doc.text(pn || 'Reporting Person', M, startY); startY += 8;
+  }
+
+  // Receipt images
+  const imgs = expenses.flatMap((mv, i) => (mv.receipts || []).map(r => ({ r, label: `Exp #${movements.indexOf(mv) + 1} — ${mv.date || ''} — ${mv.description || ''}` }))).filter(x => !x.r.startsWith('data:application/pdf'));
+  if (imgs.length) {
+    if (startY > 240) { doc.addPage(); startY = 14; }
+    doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.text('Attached Documents', M, startY); startY += 7; doc.setFont('helvetica', 'normal');
+    for (const { r, label } of imgs) {
+      const { w: iw, h: ih } = await imgDims(r);
+      let dw = CW, dh = CW * (ih / iw); if (dh > 110) { dh = 110; dw = 110 * (iw / ih); }
+      if (startY + dh + 12 > 282) { doc.addPage(); startY = 14; }
+      doc.setFontSize(7); doc.setTextColor(130, 130, 130); doc.text(label, M, startY); startY += 3;
+      const fmt = r.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+      try { doc.addImage(r, fmt, M, startY, dw, dh); } catch (e) { try { doc.addImage(r, fmt === 'PNG' ? 'JPEG' : 'PNG', M, startY, dw, dh); } catch (_) { } }
+      startY += dh + 8; doc.setTextColor(0, 0, 0);
+    }
+  }
+
+  doc.save(`${rn.replace(/\s+/g, '_')}_expense_report.pdf`);
+  showToast('✓ PDF exported');
+}
+function imgDims(src) { return new Promise(res => { const i = new Image(); i.onload = () => res({ w: i.naturalWidth, h: i.naturalHeight }); i.onerror = () => res({ w: 1, h: 1 }); i.src = src; }); }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EXPORT ODS
+// ══════════════════════════════════════════════════════════════════════════════
+async function exportODS() {
+  if (!movements.length) { showToast('⚠ No movements to export'); return; }
+  const g = id => document.getElementById(id).value || '';
+  const rn = g('reportName') || 'Expense Report';
+  const { totalAdvEur, totalExpEur, finalEur, queues } = calcBalance();
+  const xe = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const hdr = v => `<table:table-cell table:style-name="ce-h"><text:p>${xe(v)}</text:p></table:table-cell>`;
+  const cell = v => `<table:table-cell office:value-type="string"><text:p>${xe(v)}</text:p></table:table-cell>`;
+  const num = v => { const n = parseFloat(v); return isNaN(n) ? `<table:table-cell office:value-type="string"><text:p></text:p></table:table-cell>` : `<table:table-cell office:value-type="float" office:value="${n}"><text:p>${n}</text:p></table:table-cell>`; };
+  const row = cells => `<table:table-row>${cells.join('')}</table:table-row>`;
+  const empty = () => `<table:table-row><table:table-cell/></table:table-row>`;
+
+  let tr = '';
+  tr += row([hdr('EXPENSE REPORT')]); tr += row([cell('Report:'), cell(rn)]); tr += row([cell('Person:'), cell(g('personName'))]); tr += row([cell('Project:'), cell(g('projectName'))]); tr += row([cell('ID:'), cell(g('projectId'))]); tr += row([cell('Countries:'), cell(missionCountries.filter(Boolean).join(', '))]); tr += row([cell('Period:'), cell(`${g('startDate')} – ${g('endDate')}`)]); tr += row([cell('Generated:'), cell(new Date().toLocaleDateString('en-GB'))]); tr += empty();
+
+  const advances = movements.filter(m => m.type === 'advance');
+  if (advances.length) {
+    tr += row([hdr('CASH ADVANCES')]);
+    tr += row(['#', 'Date', 'Amount', 'Currency', 'Rate to EUR', 'EUR', 'Description'].map(hdr));
+    advances.forEach((m, i) => { tr += row([cell(i + 1), cell(m.date || ''), num(m.amount), cell(m.currency || ''), num(m.rate), num(m.amountEur), cell(m.description || '')]); });
+    tr += empty();
+  }
+
+  const exchanges = movements.filter(m => m.type === 'exchange');
+  if (exchanges.length) {
+    tr += row([hdr('CURRENCY EXCHANGES')]);
+    tr += row(['#', 'Date', 'From Amount', 'From Currency', 'To Amount', 'To Currency', 'Rate', 'Description'].map(hdr));
+    exchanges.forEach((m, i) => { tr += row([cell(i + 1), cell(m.date || ''), num(m.fromAmount), cell(m.fromCurrency || ''), num(m.toAmount), cell(m.toCurrency || ''), num(m.rate), cell(m.description || '')]); });
+    tr += empty();
+  }
+
+  const expenses = movements.filter(m => m.type === 'expense');
+  if (expenses.length) {
+    tr += row([hdr('EXPENSES')]);
+    tr += row(['#', 'Date', 'Amount', 'Currency', 'Rate', 'EUR', 'Payment Method', 'Budget Line', 'Doc Type', 'Description', 'FIFO Tranche Info'].map(hdr));
+    for (let i = 0; i < expenses.length; i++) {
+      const mv = expenses[i]; const mvIdx = movements.indexOf(mv);
+      const isFree = mv.rateOverride || mv.paymentMethod !== 'Cash';
+      const sliceData = !isFree ? getFifoSlices(mvIdx) : null;
+      const totalEur = sliceData ? sliceData.totalEur : (parseFloat(mv.amountEur) || 0);
+      const trancheInfo = sliceData && sliceData.slices.length > 1
+        ? sliceData.slices.map((sl, si) => `T${si + 1}: ${sl.amount.toFixed(4)} × ${sl.rate.toFixed(6)} = €${sl.eur.toFixed(2)}`).join(' | ')
+        : (sliceData ? `Rate: ${sliceData.slices[0]?.rate.toFixed(6)}` : `Manual rate: ${mv.rate}`);
+      tr += row([cell(i + 1), cell(mv.date || ''), num(mv.amount), cell(mv.currency || ''), num(isFree ? mv.rate : (sliceData?.slices[0]?.rate || mv.rate)), num(totalEur.toFixed(2)), cell(mv.paymentMethod || 'Cash'), cell(mv.budgetLine || ''), cell(mv.docType || ''), cell(mv.description || ''), cell(trancheInfo)]);
+      if (sliceData && sliceData.slices.length > 1) {
+        sliceData.slices.forEach((sl, si) => {
+          tr += row([cell(''), cell(''), cell(`  Tranche ${si + 1}`), cell(mv.currency), num(sl.rate), num(sl.eur.toFixed(2)), cell(''), cell(''), cell(''), cell(`${sl.amount.toFixed(4)} ${mv.currency}`), cell('')]);
+        });
+      }
+    }
+    tr += row([cell(''), cell(''), cell(''), cell(''), cell(''), hdr(`€${totalExpEur.toFixed(2)}`), hdr('TOTAL'), cell(''), cell(''), cell(''), cell('')]); tr += empty();
+  }
+
+  tr += row([hdr('FINANCIAL SUMMARY')]);
+  tr += row([cell('Total Advances (EUR):'), num(totalAdvEur)]);
+  tr += row([cell('Total Expenses (EUR):'), num(totalExpEur)]);
+  tr += row([hdr('Final Balance (EUR):'), num(finalEur)]);
+  const note = finalEur > 0.005 ? 'Amount to be returned to Administration Office' : finalEur < -0.005 ? 'Advance to be reimbursed to the operator' : 'Balance settled';
+  tr += row([cell('Note:'), cell(note)]); tr += empty();
+
+  const curKeys = Object.keys(queues).filter(c => queues[c].length > 0);
+  if (curKeys.length) {
+    tr += row([hdr('CASH BALANCES BY TRANCHE')]);
+    tr += row(['Currency', 'Tranche', 'Rate', 'Remaining'].map(hdr));
+    for (const cur of curKeys) {
+      queues[cur].forEach((t, i) => { tr += row([cell(cur), cell(`Tranche ${i + 1}`), num(t.rate), num(t.remaining.toFixed(4))]); });
+    }
+  }
+
+  const content = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" office:version="1.3">
+<office:automatic-styles><style:style style:name="ce-h" style:family="table-cell"><style:text-properties fo:font-weight="bold"/></style:style></office:automatic-styles>
+<office:body><office:spreadsheet><table:table table:name="Expense Report">${tr}</table:table></office:spreadsheet></office:body></office:document-content>`;
+
+  const manifest = `<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3"><manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/></manifest:manifest>`;
+  const meta = `<?xml version="1.0" encoding="UTF-8"?><office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.3"><office:meta><dc:title>${xe(rn)}</dc:title></office:meta></office:document-meta>`;
+  const mimetype = 'application/vnd.oasis.opendocument.spreadsheet';
+  const zip = new JSZip();
+  zip.file('mimetype', mimetype, { compression: 'STORE' });
+  zip.folder('META-INF').file('manifest.xml', manifest);
+  zip.file('content.xml', content); zip.file('meta.xml', meta);
+  const blob = await zip.generateAsync({ type: 'blob', mimeType: mimetype, compression: 'DEFLATE', compressionOptions: { level: 6 } });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${rn.replace(/\s+/g, '_')}_expense_report.ods` });
+  a.click(); URL.revokeObjectURL(a.href); showToast('✓ ODS exported');
 }
 
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+// ══════════════════════════════════════════════════════════════════════════════
+// NEW REPORT / PERSIST
+// ══════════════════════════════════════════════════════════════════════════════
+function newReport() {
+  if (movements.length && !confirm('Start a new report? Current data will be cleared.')) return;
+  movements = []; signatureData = null; missionCountries = ['', '', '']; sigReady = false;
+  ['reportName', 'startDate', 'endDate', 'personName', 'projectName', 'projectId'].forEach(id => document.getElementById(id).value = '');
+  for (let i = 0; i < 3; i++) { document.getElementById('country' + i).value = ''; document.getElementById('ctag' + i).style.display = 'none'; }
+  document.getElementById('sigStatus').textContent = 'Not signed';
+  renderMovements(); autoSave(); showToast('New report started');
+}
+
+function autoSave() {
+  try {
+    localStorage.setItem('expenseReportState', JSON.stringify({
+      reportName: document.getElementById('reportName').value, startDate: document.getElementById('startDate').value,
+      endDate: document.getElementById('endDate').value, personName: document.getElementById('personName').value,
+      projectName: document.getElementById('projectName').value, projectId: document.getElementById('projectId').value,
+      movements, signatureData, missionCountries
+    }));
+  } catch (e) { }
+}
+
+function loadState() {
+  loadApiKey();
+  try {
+    const raw = localStorage.getItem('expenseReportState'); if (!raw) return;
+    const s = JSON.parse(raw);
+    ['reportName', 'startDate', 'endDate', 'personName', 'projectName', 'projectId'].forEach(id => { if (s[id] !== undefined) document.getElementById(id).value = s[id]; });
+    // Migrate old format
+    if (s.expenses && !s.movements) {
+      movements = s.expenses.map(e => { if (!e.receipts) { e.receipts = e.receipt ? [e.receipt] : []; delete e.receipt; } e.type = e.type || 'expense'; e.paymentMethod = e.paymentMethod || 'Cash'; e.rateOverride = e.rateOverride || false; return e; });
+    } else {
+      movements = s.movements || [];
+      movements.forEach(m => { if (!m.receipts) m.receipts = []; if (m.type === 'expense') { m.paymentMethod = m.paymentMethod || 'Cash'; m.rateOverride = m.rateOverride || false; } });
+    }
+    signatureData = s.signatureData || null;
+    if (signatureData) document.getElementById('sigStatus').textContent = '✓ Signature saved';
+    missionCountries = s.missionCountries || ['', '', ''];
+    missionCountries.forEach((n, i) => { if (n) { document.getElementById('country' + i).value = n; updateCountry(i, n); } });
+    renderMovements();
+  } catch (e) { console.warn(e); }
+}
+
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
 </script>
 <script>
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>
 </html>
